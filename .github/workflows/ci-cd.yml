@@ -40,6 +40,10 @@ jobs:
       shell: cmd
       continue-on-error: true
 
+    - name: Prepare Reports Directory
+      run: mkdir reports\static_code_check reports\misra_check 2>nul
+      shell: cmd
+
     - name: Build
       run: |
         set PATH=C:\msys64\mingw64\bin;%PATH%
