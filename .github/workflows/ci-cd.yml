@@ -1,0 +1,60 @@
+name: Banking System CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        install: gcc g++ cmake gcovr cppcheck python
+
+    - name: Install clang-format and clang-tidy
+      run: |
+        choco install llvm -y
+      shell: powershell
+
+    - name: Code Formatting Check
+      run: clang-format --dry-run --Werror -i src/*.c include/*.h
+      shell: cmd
+
+    - name: Static Analysis + MISRA
+      run: scripts\static_code_analysis.bat
+      shell: cmd
+
+    - name: Build
+      run: |
+        set PATH=C:\msys64\mingw64\bin;%PATH%
+        cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
+        cmake --build build
+      shell: cmd
+
+    - name: Run & Coverage
+      run: |
+        build\banking_system.exe
+        gcovr -r . --html-nested reports\coverage.html --html-title="Banking System Coverage"
+      shell: cmd
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: reports/coverage.html
+
+    - name: Upload Static Analysis Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: static-analysis-reports
+        path: |
+          reports/static_code_check/
+          reports/misra_check/
