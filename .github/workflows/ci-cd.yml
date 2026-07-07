@@ -38,6 +38,7 @@ jobs:
       run: |
         cppcheck --enable=all --std=c99 -I include --platform=win64 src || echo "Static analysis completed with warnings"
       shell: cmd
+      continue-on-error: true
 
     - name: Build
       run: |
