@@ -34,15 +34,10 @@ jobs:
       run: clang-format --dry-run --Werror -i src/*.c include/*.h
       shell: cmd
 
-    - name: Static Analysis (Non-blocking)
-      run: |
-        cppcheck --enable=all --std=c99 -I include --platform=win64 src || echo "Static analysis completed with warnings"
+    - name: Static Analysis + MISRA
+      run: scripts\static_code_analysis.bat
       shell: cmd
       continue-on-error: true
-
-    - name: Prepare Reports Directory
-      run: mkdir reports\static_code_check reports\misra_check 2>nul
-      shell: cmd
 
     - name: Build
       run: |
@@ -61,7 +56,7 @@ jobs:
         gcovr -r . --html-nested reports\coverage.html --html-title="Banking System Coverage"
       shell: cmd
 
-    - name: Upload Reports
+    - name: Upload All Reports
       uses: actions/upload-artifact@v4
       with:
         name: all-reports
