@@ -1,4 +1,5 @@
 #include "account.h"
+
 #include <stdio.h>
 
 void init_account(Account* acc, int id, double initial_balance) {
