@@ -20,19 +20,17 @@ jobs:
         install: >-
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-cppcheck
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
 
-    - name: Install clang-format
-      run: choco install llvm -y
+    - name: Install Tools
+      run: |
+        choco install llvm -y
+        python -m pip install gcovr
+        choco install cppcheck -y
       shell: powershell
 
-    - name: Install gcovr via pip
-      run: python -m pip install gcovr
-      shell: cmd
-
-    - name: Code Formatting Check
+    - name: Code Formatting
       run: clang-format --dry-run --Werror -i src/*.c include/*.h
       shell: cmd
 
@@ -51,17 +49,14 @@ jobs:
       run: build\test_account.exe
       shell: cmd
 
-    - name: Run Main Program & Coverage
+    - name: Run Program & Coverage
       run: |
         build\banking_system.exe
         gcovr -r . --html-nested reports\coverage.html --html-title="Banking System Coverage"
       shell: cmd
 
-    - name: Upload Reports
+    - name: Upload All Reports
       uses: actions/upload-artifact@v4
       with:
-        name: pipeline-reports
-        path: |
-          reports/coverage.html
-          reports/static_code_check/
-          reports/misra_check/
+        name: all-reports
+        path: reports/
