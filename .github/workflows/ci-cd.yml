@@ -20,7 +20,6 @@ jobs:
         install: >-
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-gcovr
           mingw-w64-x86_64-cppcheck
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
@@ -28,6 +27,10 @@ jobs:
     - name: Install clang-format
       run: choco install llvm -y
       shell: powershell
+
+    - name: Install gcovr via pip
+      run: python -m pip install gcovr
+      shell: cmd
 
     - name: Code Formatting Check
       run: clang-format --dry-run --Werror -i src/*.c include/*.h
