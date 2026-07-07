@@ -17,11 +17,16 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         msystem: MINGW64
-        install: gcc g++ cmake gcovr cppcheck python
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-gcovr
+          mingw-w64-x86_64-cppcheck
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
 
-    - name: Install clang-format and clang-tidy
-      run: |
-        choco install llvm -y
+    - name: Install clang-format
+      run: choco install llvm -y
       shell: powershell
 
     - name: Code Formatting Check
@@ -39,22 +44,21 @@ jobs:
         cmake --build build
       shell: cmd
 
-    - name: Run & Coverage
+    - name: Run Unit Tests
+      run: build\test_account.exe
+      shell: cmd
+
+    - name: Run Main Program & Coverage
       run: |
         build\banking_system.exe
         gcovr -r . --html-nested reports\coverage.html --html-title="Banking System Coverage"
       shell: cmd
 
-    - name: Upload Coverage Report
+    - name: Upload Reports
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-report
-        path: reports/coverage.html
-
-    - name: Upload Static Analysis Reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: static-analysis-reports
+        name: pipeline-reports
         path: |
+          reports/coverage.html
           reports/static_code_check/
           reports/misra_check/
