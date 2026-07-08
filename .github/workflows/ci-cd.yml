@@ -60,8 +60,16 @@ jobs:
         gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage"
       shell: cmd
 
-    - name: Upload All Reports
+    - name: Create Release Artifacts
+      run: |
+        copy build\banking_system.exe release\banking_system.exe
+        copy build\test_account.exe release\test_account.exe
+      shell: cmd
+
+    - name: Upload All Reports and Release Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: all-reports
-        path: reports/
+        name: all-reports-and-release
+        path: |
+          reports/
+          release/
