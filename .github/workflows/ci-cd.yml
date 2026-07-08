@@ -53,7 +53,7 @@ jobs:
     - name: Run Program & Coverage
       run: |
         build\banking_system.exe
-        gcovr -r . --html-nested reports\coverage.html --html-title="Banking System Coverage"
+        gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage"
       shell: cmd
 
     - name: Upload All Reports

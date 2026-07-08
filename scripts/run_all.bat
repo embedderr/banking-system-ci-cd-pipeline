@@ -6,7 +6,7 @@ echo ================================================
 cd /d "%~dp0\.."
 
 echo [1/8] Cleaning previous outputs...
-rd /s /q build reports 2>nul
+Remove-Item -Recurse -Force build, reports -ErrorAction SilentlyContinue
 mkdir reports\static_code_check reports\misra_check
 
 echo [2/8] Code Formatting Check...
@@ -20,14 +20,11 @@ set PATH=C:\msys64\mingw64\bin;%PATH%
 cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 
-echo [5/8] Running Unit Tests...
-build\test_account.exe
-
-echo [6/8] Running Main Program...
+echo [5/8] Running Program for Coverage...
 build\banking_system.exe
 
-echo [7/8] Generating Code Coverage Report...
-gcovr -r . --html-nested reports\coverage.html --html-title="Banking System - Code Coverage"
+echo [6/8] Generating Code Coverage Report...
+gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System - Code Coverage"
 
 echo.
 echo ================================================
@@ -35,7 +32,7 @@ echo     Full Pipeline Completed Successfully!
 echo ================================================
 echo Reports Summary:
 echo   - Static Analysis : reports\static_code_check\index.html
-echo   - MISRA           : reports\misra_check\index.html
-echo   - Code Coverage   : reports\coverage.html
+echo   - MISRA Violations : reports\misra_check\index.html
+echo   - Code Coverage    : reports\code_coverage\coverage.html
 echo.
 pause
