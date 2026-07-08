@@ -5,6 +5,9 @@ echo ================================================
 
 cd /d "%~dp0\.."
 
+echo [0/9] Checking Requirements...
+call scripts\requirements.bat
+
 echo [1/9] Cleaning previous outputs...
 rd /s /q build reports release 2>nul
 mkdir reports\static_code_check reports\misra_check reports\code_coverage
