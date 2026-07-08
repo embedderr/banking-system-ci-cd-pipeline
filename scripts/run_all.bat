@@ -37,12 +37,12 @@ echo [8/9] Creating Release Artifacts for QA...
 copy build\banking_system.exe release\banking_system.exe
 copy build\test_account.exe release\test_account.exe
 
-:: Copy object files
+:: Copy object files from build
 copy build\CMakeFiles\banking_system.dir\src\*.o release\ 2>nul
 copy build\CMakeFiles\test_account.dir\tests\*.o release\ 2>nul
 copy build\CMakeFiles\test_account.dir\src\*.o release\ 2>nul
 
-:: Create .bin files (binary dump)
+:: Create .bin files (binary images)
 objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
 objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
 
@@ -53,6 +53,6 @@ echo Reports & Artifacts Ready:
 echo   - Static Analysis : reports\static_code_check\index.html
 echo   - MISRA           : reports\misra_check\index.html
 echo   - Code Coverage   : reports\code_coverage\coverage.html
-echo   - QA Executables  : release/ folder (includes .exe, .o, .bin)
+echo   - QA Artifacts    : release/ folder (.exe, .o, .bin)
 echo ================================================
 pause
