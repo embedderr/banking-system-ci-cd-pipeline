@@ -30,6 +30,10 @@ jobs:
         choco install cppcheck -y
       shell: powershell
 
+    - name: Prepare Directories
+      run: mkdir reports\static_code_check reports\misra_check reports\code_coverage release 2>nul
+      shell: cmd
+
     - name: Code Formatting
       run: clang-format --dry-run --Werror -i src/*.c include/*.h
       shell: cmd
