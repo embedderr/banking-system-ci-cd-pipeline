@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+
+    - name: Install Tools
+      run: |
+        choco install llvm -y
+        python -m pip install gcovr
+      shell: powershell
+
+    - name: Build
+      run: |
+        set PATH=C:\msys64\mingw64\bin;%PATH%
+        cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+      shell: cmd
+
+    - name: Generate Changelog
+      uses: orhun/git-cliff-action@v2
+      with:
+        config: cliff.toml
+        args: --verbose
+      env:
+        OUTPUT: CHANGELOG.md
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/banking_system.exe
+          build/test_account.exe
+          reports/code_coverage/coverage.html
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        body_path: CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
