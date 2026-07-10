@@ -35,12 +35,20 @@ jobs:
         cmake --build build
       shell: cmd
 
+    - name: Create Binary Files
+      run: |
+        objcopy -O binary build\banking_system.exe build\banking_system.bin
+        objcopy -O binary build\test_account.exe build\test_account.bin
+      shell: cmd
+
     - name: Create Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v1
       with:
         files: |
           build/banking_system.exe
           build/test_account.exe
+          build/banking_system.bin
+          build/test_account.bin
           reports/code_coverage/coverage.html
         tag_name: ${{ github.ref }}
         name: Release ${{ github.ref }}
