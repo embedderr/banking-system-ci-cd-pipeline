@@ -33,14 +33,6 @@ jobs:
         cmake --build build
       shell: cmd
 
-    - name: Generate Changelog
-      uses: orhun/git-cliff-action@v2
-      with:
-        config: cliff.toml
-        args: --verbose
-      env:
-        OUTPUT: CHANGELOG.md
-
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
@@ -50,6 +42,6 @@ jobs:
           reports/code_coverage/coverage.html
         tag_name: ${{ github.ref }}
         name: Release ${{ github.ref }}
-        body_path: CHANGELOG.md
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
