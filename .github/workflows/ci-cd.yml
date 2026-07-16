@@ -84,8 +84,7 @@ jobs:
         username: ${{ secrets.EMAIL_USERNAME }}
         password: ${{ secrets.EMAIL_APP_PASSWORD }}
         subject: "[${{ github.ref_name }}] CI/CD - ${{ job.status }}"
-        to: smaddu27@gmail.com
-        cc: 19mskumar@gmail.com
+        to: ${{ contains(github.ref_name, 'develop') && 'smaddu27@gmail.com' || '19mskumar@gmail.com' }}
         from: GitHub Actions <no-reply@github.com>
         body: |
           Pipeline Status: ${{ job.status }}
