@@ -1285,11 +1285,11 @@ git pull origin develop
 
 
 
-# For normal release: 
+# cmds for normal release: 
 git tag v1.0.0
 git push origin v1.0.0
 
-# For Release Candidate:
+# cmds for Release Candidate:
 git tag v1.0.0-rc1
 git push origin v1.0.0-rc1
 
