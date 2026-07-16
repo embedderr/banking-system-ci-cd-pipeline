@@ -66,7 +66,8 @@ jobs:
         username: ${{ secrets.EMAIL_USERNAME }}
         password: ${{ secrets.EMAIL_APP_PASSWORD }}
         subject: "Banking System Release ${{ github.ref }} - ${{ job.status }}"
-        to: 19mskumar@gmail.com, smaddu27@gmail.com
+        to: 19mskumar@gmail.com
+        cc: smaddu27@gmail.com
         from: GitHub Actions <no-reply@github.com>
         body: |
           Release Status: ${{ job.status }}
