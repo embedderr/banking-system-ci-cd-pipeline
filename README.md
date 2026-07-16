@@ -1283,7 +1283,7 @@ git checkout develop
 # Get latest changes from GitHub          
 git pull origin develop       
 
-
+---------------------------
 
 # cmds for normal release: 
 git tag v1.0.0
