@@ -1218,7 +1218,14 @@ git push origin v1.0.1
 
 git cmds in this project so far:
 
-git add 
+
+# to stage all new, modified, and deleted files or changes
+git add .
+
+# creates main branch
+git branch -M main
+
+
 
 # exmaple commit msg
 git commit -m "feat: include .bin files in automated release"
