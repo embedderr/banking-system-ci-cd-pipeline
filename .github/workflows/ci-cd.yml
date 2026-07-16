@@ -74,3 +74,21 @@ jobs:
         path: |
           reports/
           release/
+
+    - name: Send Notification to Dev Team
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_APP_PASSWORD }}
+        subject: "[${{ github.ref_name }}] CI/CD - ${{ job.status }}"
+        to: maddusomesh2000@gmail.com
+        from: GitHub Actions <no-reply@github.com>
+        body: |
+          Pipeline Status: ${{ job.status }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        content_type: text/plain

@@ -51,7 +51,25 @@ jobs:
           build/test_account.bin
           reports/code_coverage/coverage.html
         tag_name: ${{ github.ref }}
-        name: Release ${{ github.ref }}
+        name: Banking System ${{ github.ref }}
         generate_release_notes: true
+        prerelease: ${{ contains(github.ref, 'rc') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Send Notification
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_APP_PASSWORD }}
+        subject: "Banking System Release ${{ github.ref }} - ${{ job.status }}"
+        to: 19mskumar@gmail.com, smaddu27@gmail.com
+        from: GitHub Actions <no-reply@github.com>
+        body: |
+          Release Status: ${{ job.status }}
+          Version: ${{ github.ref }}
+          Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        content_type: text/plain
