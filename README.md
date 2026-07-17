@@ -1637,7 +1637,7 @@ git push
 
 CI generates another QA build.
 
-When you're ready for another candidate:
+When you're ready for another release candidate:
 
 git tag v4.0.1-rc2
 git push origin v4.0.1-rc2
