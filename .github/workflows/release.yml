@@ -78,7 +78,7 @@ jobs:
         subject: "Banking System Release ${{ github.ref }} - ${{ job.status }}"
         to: 19mskumar@gmail.com
         cc: smaddu27@gmail.com
-        from: maddusomesh2000@gmail.com
+        from: GitHub Actions <no-reply@github.com>
         body: |
           Release Status: ${{ job.status }}
           Version: ${{ github.ref }}
