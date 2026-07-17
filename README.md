@@ -1276,7 +1276,7 @@ git checkout develop
 # Get latest changes from GitHub          
 git pull origin develop       
 
-
+---------------------------
 
 # For normal release: 
 git tag v1.0.0
@@ -1339,5 +1339,15 @@ Restores the most recently stashed changes onto your current branch and removes 
 git stash pop
 
 After this, your changes appear on develop.
+
+---------------------------
+
+# for merging, releasing
+git switch release/3.0
+git pull origin release/3.0
+git merge develop
+git push origin release/3.0
+git tag v3.0.1-rc1
+git push origin v3.0.1-rc1
 
 ---------------------------
