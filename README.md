@@ -1678,4 +1678,5 @@ git push origin --delete release/4.0
 
 ```
 
-Clear separation between everyday QA builds and formally versioned release candidates.
+Clear separation between everyday QA builds, formally versioned release candidates and production releases
+
