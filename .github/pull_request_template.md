@@ -8,7 +8,9 @@
 
 - [ ] Unit Tests passed
 - [ ] Manually tested
-- [ ] Code reviewed
+- [ ] Static Analysis / MISRA passed
+- [ ] Code coverage checked
+- [ ] Code reviewd
 
 ## Related Issue
 Closes #XX
