@@ -1351,3 +1351,331 @@ git tag v3.0.1-rc1
 git push origin v3.0.1-rc1
 
 ---------------------------
+
+
+git wrokflow I followed in this project
+
+Develop features on feature/*
+Merge features into develop
+Create release/x.y
+Generate RC1, RC2, etc. from release/x.y
+Apply QA bug fixes only on release/x.y
+Merge release/x.y → main (production)
+Tag the production release (vX.Y.Z)
+Merge release/x.y → develop
+Delete release/x.y
+
+
+
+As below:
+
+
+Important distinction between **internal QA builds**, **Release Candidates (RCs)** and **Production Release**
+
+
+
+---
+
+# Phase 1: Development
+
+```text
+develop
+   │
+   ├── Feature A
+   ├── Feature B
+   ├── Feature C
+```
+
+When all planned features for 4.0.1 are complete:
+
+```bash
+git switch develop
+git switch -c release/4.0
+git push -u origin release/4.0
+```
+
+At this point, **feature development for 4.0.1 is frozen**. Only bug fixes go into `release/4.0`.
+
+---
+
+# Phase 2: QA Builds
+
+Your CI can generate builds like:
+
+```text
+Build #101
+Build #102
+Build #103
+Build #104
+```
+
+or
+
+```text
+QA-001
+QA-002
+QA-003
+```
+
+These are **internal builds** for testers.
+
+Example:
+
+```text
+Build #101
+↓
+QA finds 20 bugs
+
+Fix bugs
+
+Build #102
+↓
+QA finds 10 bugs
+
+Fix bugs
+
+Build #103
+↓
+QA finds 3 bugs
+
+Fix bugs
+
+Build #104
+↓
+No major bugs
+```
+
+These builds usually **are not tagged** because they're just intermediate verification builds.
+
+---
+
+# Phase 3: Release Candidates
+
+Once the team believes the software is stable enough to be a release candidate:
+
+
+```bash
+
+
+git add README.md 
+git commit -m "fix: updated README.md file"
+git push
+git tag v4.0.1-rc1
+git push origin v4.0.1-rc1
+```
+
+```text
+v4.0.1-rc1
+```
+
+QA performs a much more thorough validation.
+
+If bugs are found:
+
+```text
+Fix
+↓
+
+v4.0.1-rc2
+
+Fix
+↓
+
+v4.0.1-rc3
+
+Fix
+↓
+
+v4.0.1-rc4
+
+Fix
+↓
+
+v4.0.1-rc5
+```
+
+If RC5 passes:
+
+```text
+git switch main
+git merge release/4.0 --no-ff
+git tag v4.0.1
+git push origin main --tags/git push origin v4.0.1
+```
+
+Production release:
+
+```text
+v4.0.1
+```
+
+---
+
+# Timeline
+
+```text
+develop
+    │
+    └──────────────┐
+                   ▼
+             release/4.0
+                   │
+                   │
+            Build #101
+                   │
+            Build #102
+                   │
+            Build #103
+                   │
+            Build #104
+                   │
+                   ▼
+               v4.0.1-rc1
+                   │
+               v4.0.1-rc2
+                   │
+               v4.0.1-rc3
+                   │
+               v4.0.1-rc4
+                   │
+               v4.0.1-rc5
+                   │
+                   ▼
+                v4.0.1
+                   │
+             Merge to main
+```
+
+---
+
+# Approach
+
+Handling releases:
+
+* One `release/4.0` branch.
+* Multiple bug-fix commits on that branch.
+* Multiple builds while QA tests.
+* Multiple RCs if necessary.
+* Final production tag after the last RC is approved.
+
+The only adjustment I'd make is this:
+
+* **QA builds** (Build #101, #102, etc.) are identified by the CI system's build number
+* **RCs** (`v4.0.1-rc1`, `v4.0.1-rc2`, ...) are tagged, they represent candidate release snapshots.
+
+---
+
+## GitHub Actions CI/CD pipeline 
+
+Based on the CI/CD pipeline building, a practical convention would be:
+
+* Push to `release/4.0` → CI generates **Build #xxx** artifacts automatically for QA.
+* When you decide a build is release-candidate quality, create a tag:
+
+  * `v4.0.1-rc1`
+  * `v4.0.1-rc2`
+  * …
+* When the final RC is approved:
+
+  * Merge `release/4.0` → `main`
+  * Create tag `v4.0.1`
+  * CI generates the production artifact.
+
+
+```bash
+
+Create the release branch
+
+git switch develop
+git pull origin develop
+git switch -c release/4.0
+git push -u origin release/4.0
+
+Pulling develop first ensures your release branch starts from the latest integrated code.
+
+-
+-
+-
+-
+
+QA finds bugs
+
+Fix them on release/4.0
+
+git add .
+git commit -m "fix: updated README.md"
+git push
+
+Your CI can automatically produce a QA build from this push.
+
+-
+-
+-
+-
+
+Create RC1
+
+Once you decide this specific commit is a Release Candidate:
+
+git tag v4.0.1-rc1
+git push origin v4.0.1-rc1
+
+Your CI should be configured so that pushing an *-rc* tag generates the RC artifact.
+
+-
+-
+-
+-
+
+QA tests RC1
+
+If bugs are found:
+
+git add .
+git commit -m "fix: resolve login issue"
+git push
+
+CI generates another QA build.
+
+When you're ready for another candidate:
+
+git tag v4.0.1-rc2
+git push origin v4.0.1-rc2
+
+Repeat as needed:
+
+v4.0.1-rc1
+v4.0.1-rc2
+v4.0.1-rc3
+v4.0.1-rc4
+v4.0.1-rc5
+
+```
+
+Final Release
+
+When the last RC is approved:
+
+```bash
+git switch main
+git pull origin main
+git merge release/4.0 --no-ff -m "Release v4.0.1"
+git tag v4.0.1
+git push origin main
+git push origin v4.0.1
+
+Then synchronize the branches:
+
+git switch develop
+git merge release/4.0
+git push origin develop
+
+Finally, if you no longer need it:
+
+git branch -d release/4.0
+git push origin --delete release/4.0
+
+
+```
+
+Clear separation between everyday QA builds and formally versioned release candidates.
