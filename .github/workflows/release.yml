@@ -28,6 +28,12 @@ jobs:
         python -m pip install gcovr
       shell: powershell
 
+    - name: Extract Version
+      shell: bash
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
     - name: Build
       run: |
         set PATH=C:\msys64\mingw64\bin;%PATH%
@@ -35,23 +41,27 @@ jobs:
         cmake --build build
       shell: cmd
 
-    - name: Create Binary Files
+    - name: Create Binary Files & Rename with Version
       run: |
-        objcopy -O binary build\banking_system.exe build\banking_system.bin
-        objcopy -O binary build\test_account.exe build\test_account.bin
+        objcopy -O binary build\banking_system.exe build\banking_system_%VERSION%.bin
+        objcopy -O binary build\test_account.exe build\test_account_%VERSION%.bin
+        copy build\banking_system.exe build\banking_system_%VERSION%.exe
+        copy build\test_account.exe build\test_account_%VERSION%.exe
       shell: cmd
+      env:
+        VERSION: ${{ env.VERSION }}
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          build/banking_system.exe
-          build/test_account.exe
-          build/banking_system.bin
-          build/test_account.bin
+          build/banking_system_${{ env.VERSION }}.exe
+          build/test_account_${{ env.VERSION }}.exe
+          build/banking_system_${{ env.VERSION }}.bin
+          build/test_account_${{ env.VERSION }}.bin
           reports/code_coverage/coverage.html
         tag_name: ${{ github.ref }}
-        name: Banking System ${{ github.ref }}
+        name: Banking System ${{ env.VERSION }}
         generate_release_notes: true
         prerelease: ${{ contains(github.ref, 'rc') }}
       env:

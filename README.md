@@ -1285,7 +1285,11 @@ git pull origin develop
 
 ---------------------------
 
+<<<<<<< HEAD
 # cmds for normal release: 
+=======
+# For normal release: 
+>>>>>>> release/3.0
 git tag v1.0.0
 git push origin v1.0.0
 
@@ -1295,3 +1299,66 @@ git push origin v1.0.0-rc1
 
 ---------------------------
 
+
+# made some changes in any branch by mistake, and relaised, not commited, and want to restore your working tree to the last commit and all uncommitted changes will be lost.
+
+git restore .
+
+# If you also created new untracked files:
+
+git clean -fd
+
+
+---------------------------
+
+# Save uncommitted changes
+git stash          
+
+
+
+git stash
+
+Temporarily saves your modified files and restores your working directory to the last committed state.
+
+Before:
+
+main
+ ├── modified file1.c
+ ├── modified file2.c
+
+Run:
+
+git stash
+
+After:
+
+Your modifications are saved in a stash.
+Your working directory becomes clean.
+
+# Move to develop branch
+git switch develop 
+
+# Apply the saved changes on develop
+git stash pop      
+
+
+
+git stash pop
+
+Restores the most recently stashed changes onto your current branch and removes that stash from the stash list.
+
+git stash pop
+
+After this, your changes appear on develop.
+
+---------------------------
+
+# for merging, releasing
+git switch release/3.0
+git pull origin release/3.0
+git merge develop
+git push origin release/3.0
+git tag v3.0.1-rc1
+git push origin v3.0.1-rc1
+
+---------------------------

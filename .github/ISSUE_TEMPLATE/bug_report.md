@@ -20,10 +20,14 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear description of what you expected to happen.
 
+**Actual behavior**
+What actually happened.
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
 **Environment**
 - Branch: 
-- Build Number: 
+- Build Number / Version: 
 - OS: Windows 10/11
+- Other relevant details:

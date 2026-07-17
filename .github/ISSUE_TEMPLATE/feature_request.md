@@ -13,5 +13,8 @@ A clear description of the problem.
 **Describe the solution you'd like**
 A clear description of what you want to happen.
 
+**Describe alternatives you've considered**
+Any alternative solutions or features you considered.
+
 **Additional context**
-Add any other context or screenshots about the feature request here.
+Add any other context, screenshots, or references about the feature request here.
