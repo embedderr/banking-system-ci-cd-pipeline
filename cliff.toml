@@ -22,12 +22,26 @@ trim = true
 conventional_commits = true
 filter_unconventional = true
 
-[git.conventional_commits]
-types = [
-  { type = "feat", section = "Added" },
-  { type = "fix", section = "Fixed" },
-  { type = "docs", section = "Documentation" },
-  { type = "chore", section = "Miscellaneous" },
-  { type = "refactor", section = "Changed" },
-  { type = "test", section = "Tests" },
-]
+[[git.commit_parsers]]
+message = "^feat"
+group = "Added"
+
+[[git.commit_parsers]]
+message = "^fix"
+group = "Fixed"
+
+[[git.commit_parsers]]
+message = "^docs"
+group = "Documentation"
+
+[[git.commit_parsers]]
+message = "^chore"
+group = "Miscellaneous"
+
+[[git.commit_parsers]]
+message = "^refactor"
+group = "Changed"
+
+[[git.commit_parsers]]
+message = "^test"
+group = "Tests"
