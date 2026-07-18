@@ -4,6 +4,8 @@ header = """
 
 All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 """
 
 body = """
@@ -22,10 +24,10 @@ filter_unconventional = true
 
 [git.conventional_commits]
 types = [
-  { type = "feat", section = "Features" },
-  { type = "fix", section = "Bug Fixes" },
+  { type = "feat", section = "Added" },
+  { type = "fix", section = "Fixed" },
   { type = "docs", section = "Documentation" },
   { type = "chore", section = "Miscellaneous" },
-  { type = "refactor", section = "Refactoring" },
+  { type = "refactor", section = "Changed" },
   { type = "test", section = "Tests" },
 ]

@@ -51,6 +51,13 @@ jobs:
       env:
         VERSION: ${{ env.VERSION }}
 
+    - name: Generate Changelog
+      uses: orhun/git-cliff-action@v4
+      with:
+        config: cliff.toml
+      env:
+        OUTPUT: CHANGELOG.md
+        
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
@@ -60,6 +67,7 @@ jobs:
           build/banking_system_${{ env.VERSION }}.bin
           build/test_account_${{ env.VERSION }}.bin
           reports/code_coverage/coverage.html
+          CHANGELOG.md
         tag_name: ${{ github.ref }}
         name: Banking System ${{ env.VERSION }}
         generate_release_notes: true
