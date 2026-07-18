@@ -1596,6 +1596,7 @@ Based on the CI/CD pipeline building, a practical convention would be:
 ```bash
 
 
+
 Create the release branch
 
 git switch develop
