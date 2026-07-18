@@ -4,14 +4,15 @@ header = """
 
 All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 """
 
 body = """
-## [{{version}}] - {{timestamp}}
-
-{{#each commits}}
-- {{#if breaking}}**BREAKING:** {{/if}}{{#if scope}}**{{scope}}:** {{/if}}{{subject}}
-{{/each}}
+## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% for commit in commits %}
+- {% if commit.breaking %}**BREAKING:** {% endif %}{% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message }}
+{% endfor %}
 """
 
 trim = true
@@ -20,12 +21,26 @@ trim = true
 conventional_commits = true
 filter_unconventional = true
 
-[git.conventional_commits]
-types = [
-  { type = "feat", section = "Features" },
-  { type = "fix", section = "Bug Fixes" },
-  { type = "docs", section = "Documentation" },
-  { type = "chore", section = "Miscellaneous" },
-  { type = "refactor", section = "Refactoring" },
-  { type = "test", section = "Tests" },
-]
+[[git.commit_parsers]]
+message = "^feat"
+group = "Added"
+
+[[git.commit_parsers]]
+message = "^fix"
+group = "Fixed"
+
+[[git.commit_parsers]]
+message = "^docs"
+group = "Documentation"
+
+[[git.commit_parsers]]
+message = "^chore"
+group = "Miscellaneous"
+
+[[git.commit_parsers]]
+message = "^refactor"
+group = "Changed"
+
+[[git.commit_parsers]]
+message = "^test"
+group = "Tests"
