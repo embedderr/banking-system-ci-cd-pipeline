@@ -27,8 +27,20 @@ jobs:
       run: |
         choco install llvm -y
         python -m pip install gcovr
-        choco install cppcheck -y
       shell: powershell
+
+    - name: Install cppcheck (official release, avoids broken choco FILESDIR)
+      shell: pwsh
+      run: |
+        $version = "2.14.2"
+        $url = "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
+        Invoke-WebRequest -Uri $url -OutFile cppcheck.msi
+        Start-Process msiexec.exe -ArgumentList "/i cppcheck.msi /quiet /norestart" -Wait
+        echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+    - name: Verify cppcheck
+      run: cppcheck --version
+      shell: cmd
 
     - name: Prepare Directories
       run: |
@@ -42,7 +54,6 @@ jobs:
     - name: Static Analysis + MISRA
       run: scripts\static_code_analysis.bat
       shell: cmd
-      continue-on-error: true
 
     - name: Build
       run: |
