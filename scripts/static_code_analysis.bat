@@ -38,4 +38,3 @@ echo ================================================
 echo Reports available at:
 echo   - reports\static_code_check\index.html
 echo   - reports\misra_check\index.html
-pause

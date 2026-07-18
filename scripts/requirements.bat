@@ -24,4 +24,3 @@ cppcheck --version >nul 2>&1 || echo [WARNING] cppcheck not found.
 echo.
 echo Requirements check completed.
 echo ================================================
-pause

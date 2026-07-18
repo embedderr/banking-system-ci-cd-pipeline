@@ -55,4 +55,3 @@ echo   - MISRA           : reports\misra_check\index.html
 echo   - Code Coverage   : reports\code_coverage\coverage.html
 echo   - QA Artifacts    : release/ folder (.exe, .o, .bin)
 echo ================================================
-pause
