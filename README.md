@@ -1717,7 +1717,7 @@ git push origin --delete v5.0.0-rc3
 
 ---------------------------
 
-Resetting develop branch to match main:(because develop was modified and pushed to repo(which is not supposed to be done) and then releaase/5.0 was created from develop and release/5.0 failed and deprecated, so release/5.0 is deleted everywhere and now develop was synchronized to match main which has a stable production code)
+Resetting develop branch to match main:(because develop was modified and pushed to repo, and then releaase/5.0 was created from develop locally and release/5.0 failed and deprecated because of enough bugs, so release/5.0 is deleted everywhere and now develop was synchronized to match main(v4.0.1 - which has a stable production code)
 Reset develop branch to match main (since release/4.0 is already merged to main)
 
 Make sure you are on develop
