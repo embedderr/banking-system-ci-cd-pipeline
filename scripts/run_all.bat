@@ -49,7 +49,7 @@ objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
 echo [9/9] Pipeline Completed Successfully!
 echo.
 echo ================================================
-echo Reports & Artifacts Ready:
+echo Reports and Artifacts Ready:
 echo   - Static Analysis : reports\static_code_check\index.html
 echo   - MISRA           : reports\misra_check\index.html
 echo   - Code Coverage   : reports\code_coverage\coverage.html
