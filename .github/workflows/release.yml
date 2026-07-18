@@ -57,6 +57,32 @@ jobs:
         config: cliff.toml
       env:
         OUTPUT: CHANGELOG.md
+
+    - name: Determine target branch for changelog commit
+      id: branch
+      shell: bash
+      run: |
+        RAW_VERSION=${GITHUB_REF#refs/tags/v}
+        if [[ "$RAW_VERSION" == *"-rc"* ]]; then
+          BASE=${RAW_VERSION%%-rc*}
+          MAJOR_MINOR=$(echo "$BASE" | cut -d. -f1,2)
+          TARGET_BRANCH="release/$MAJOR_MINOR"
+        else
+          TARGET_BRANCH="main"
+        fi
+        echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
+        echo "Target branch resolved to: $TARGET_BRANCH"
+
+    - name: Commit and push updated CHANGELOG.md
+      shell: bash
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git fetch origin ${TARGET_BRANCH}
+        git checkout ${TARGET_BRANCH}
+        git add CHANGELOG.md
+        git diff --cached --quiet || git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
+        git push origin ${TARGET_BRANCH}        
         
     - name: Create Release
       uses: softprops/action-gh-release@v2
