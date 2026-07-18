@@ -21,13 +21,13 @@ cppcheck --xml --enable=all --std=c99 %includes% --platform=%platfrm% --addon=./
 
 echo [3/3] Generating HTML Reports...
 python ./static_code_analysis/htmlreport/cppcheck-htmlreport ^
-  --file=reports\MISRA_file.xml ^
+  --file=reports\misra_check\MISRA_file.xml ^
   --title=Banking_System ^
   --report-dir=./reports/misra_check ^
   --source-dir=.
 
 python ./static_code_analysis/htmlreport/cppcheck-htmlreport ^
-  --file=reports\static_file.xml ^
+  --file=reports\static_code_check\static_file.xml ^
   --title=Banking_System ^
   --report-dir=./reports/static_code_check ^
   --source-dir=.
