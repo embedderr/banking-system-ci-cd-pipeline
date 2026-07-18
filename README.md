@@ -1691,3 +1691,54 @@ git push origin --delete release/4.0
 
 Clear separation between everyday QA builds, formally versioned release candidates and production releases
 
+---------------------------
+
+Deleting branches and tags:
+
+# 1. Switch to develop
+git checkout develop
+
+# 2. Pull latest from remote develop (just in case)
+git pull origin develop
+
+# 3. Delete local release/5.0 branch
+git branch -D release/5.0
+
+# 4. Delete remote release/5.0 branch
+git push origin --delete release/5.0
+
+# 5. Delete the test tag (optional but clean)
+git tag -d v5.0.0-rc1
+git tag -d v5.0.0-rc2
+git tag -d v5.0.0-rc3
+git push origin --delete v5.0.0-rc1
+git push origin --delete v5.0.0-rc2
+git push origin --delete v5.0.0-rc3
+
+---------------------------
+
+Resetting develop branch to match main:(because develop was modified and pushed to repo, and then releaase/5.0 was created from develop locally and release/5.0 failed and deprecated because of enough bugs, so release/5.0 is deleted everywhere and now develop was synchronized to match main(v4.0.1 - which has a stable production code)
+Reset develop branch to match main (since release/4.0 is already merged to main)
+
+Make sure you are on develop
+git checkout develop
+
+# Reset develop to main (this will remove all unwanted changes from release/5.0 experiment)
+git reset --hard origin/main
+
+# Force push to update remote develop
+git push origin develop --force
+
+---------------------------
+
+Alternative (Merge main into develop):
+
+# You can do merge instead, but it's not as clean in this situation.
+
+git checkout develop
+git merge main --no-ff -m "Merge main into develop (cleanup)"
+git push
+
+# But this will create an extra merge commit and keep unnecessary history.
+
+---------------------------
