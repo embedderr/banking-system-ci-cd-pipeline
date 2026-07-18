@@ -9,11 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 """
 
 body = """
-## [{{version}}] - {{timestamp}}
-
-{{#each commits}}
-- {{#if breaking}}**BREAKING:** {{/if}}{{#if scope}}**{{scope}}:** {{/if}}{{subject}}
-{{/each}}
+## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% for commit in commits %}
+- {% if commit.breaking %}**BREAKING:** {% endif %}{% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message }}
+{% endfor %}
 """
 
 trim = true
