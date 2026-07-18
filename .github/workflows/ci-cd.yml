@@ -41,7 +41,8 @@ jobs:
         $srcZipUrl = "https://github.com/danmar/cppcheck/archive/refs/tags/$version.zip"
         Invoke-WebRequest -Uri $srcZipUrl -OutFile cppcheck-src.zip
         Expand-Archive -Path cppcheck-src.zip -DestinationPath cppcheck-src -Force
-        Copy-Item -Recurse -Force "cppcheck-src\cppcheck-$version\addons\*" "C:\Program Files\Cppcheck\addons\"
+        robocopy "cppcheck-src\cppcheck-$version\addons" "C:\Program Files\Cppcheck\addons" /E /IS /IT
+        if ($LASTEXITCODE -ge 8) { exit 1 } else { $global:LASTEXITCODE = 0 }
 
     - name: Verify cppcheck and addons
       run: |
