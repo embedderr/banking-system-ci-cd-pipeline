@@ -1677,16 +1677,96 @@ git tag v4.0.1
 git push origin main
 git push origin v4.0.1
 
-Then synchronize the branches:
+-
+-
+-
+-
+-
+
+# merging release with main and commiting main with production release version so that CHANGELOG.md gets updated with release version 
+# ── Step 1: Make sure your local release branch has everything, including CI's changelog commits ──
+git switch release/7.0
+git pull origin release/7.0
+ 
+# ── Step 2: Switch to main and make sure it's current ──
+git switch main
+git pull origin main
+ 
+# ── Step 3: Merge the release branch into main ──
+git merge release/7.0 --no-ff -m "Release v7.0.1"
+ 
+# ── Step 4 (ONLY if a conflict appears, usually on CHANGELOG.md): resolve by taking release branch's version ──
+git checkout --theirs CHANGELOG.md
+git add CHANGELOG.md
+git commit -m "Release v7.0.1"
+ 
+# ── Step 5: Add an empty commit so git-cliff has something to log under the new production version ──
+git commit --allow-empty -m "chore: promote v7.0.1-rc1 to production as v7.0.1"
+ 
+# ── Step 6: Push main ──
+git push origin main
+ 
+# ── Step 7: Tag the production release and push the tag (this triggers the Release workflow) ──
+git tag v7.0.1
+git push origin v7.0.1
+
+-
+-
+-
+-
+-
+
+Then synchronize the branches:(sync release with develop)
 
 git switch develop
+git pull origin develop
 git merge release/4.0
+git push origin develop
+
+-
+-
+-
+-
+
+Then synchronize the branches:(sync main with develop)
+
+git switch develop
+git pull origin develop
+git merge main --no-ff -m "Sync develop with main after v8.0.0"
 git push origin develop
 
 Finally, if you no longer need it:
 
 git branch -d release/4.0
 git push origin --delete release/4.0
+
+
+
+## This gives you <commits only in main>  <commits only in develop>. If both are 0, they're fully in sync.
+git fetch origin
+git rev-list --left-right --count origin/main...origin/develop
+
+-
+-
+-
+-
+
+# For details on what's different (if anything):
+git log origin/develop..origin/main --oneline
+# Shows commits on main that develop doesn't have.
+
+git log origin/main..origin/develop --oneline
+# Shows commits on develop that main doesn't have.
+
+
+# To confirm actual file content is identical (not just commit count):
+git diff origin/main origin/develop
+# Empty output = no real differences, regardless of commit count (merge commits can differ in count while content stays identical, like you saw last time).
+
+
+
+
+
 
 
 ```
@@ -1742,5 +1822,37 @@ git merge main --no-ff -m "Merge main into develop (cleanup)"
 git push
 
 # But this will create an extra merge commit and keep unnecessary history.
+
+---------------------------
+
+
+
+=========
+To Do:  
+=========
+
+The whole list formatted as a Markdown checklist — ready to drop straight into your `README.md`:
+
+```markdown
+## CI/CD Improvements — To Do
+
+### High Impact
+- [ ] Add branch protection rules on `main` (and ideally `develop`) — require status checks to pass, block direct pushes, PR-only merges
+- [ ] Scope `permissions: contents: read` in `ci-cd.yml`
+- [ ] Add `concurrency` control to `ci-cd.yml` to cancel stale runs on rapid pushes
+- [ ] Add `timeout-minutes` at the job level in `ci-cd.yml`
+
+### Medium Impact
+- [ ] Make cppcheck actually fail the build on findings (`--error-exitcode=1` or scoped to `error` severity)
+- [ ] Add caching (`actions/cache`) for MSYS2 packages, pip, and cppcheck install to speed up CI
+- [ ] Add `.github/dependabot.yml` to auto-update GitHub Actions versions
+
+### Nice to Have
+- [ ] Add CI build status badge to `README.md`
+- [ ] Test both `Debug` and `Release` build types in `ci-cd.yml` (currently only `Debug` is tested; `release.yml` only builds `Release`)
+- [ ] Set explicit artifact `retention-days` (e.g. 14) instead of relying on GitHub's 90-day default
+```
+
+Paste that into your `README.md` wherever makes sense — a new `## CI/CD Improvements` section near the top, or in a `CONTRIBUTING.md`/`TODO.md` if you keep those separate.
 
 ---------------------------
