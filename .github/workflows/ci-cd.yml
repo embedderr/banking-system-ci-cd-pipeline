@@ -71,12 +71,14 @@ jobs:
       shell: cmd
 
     - name: Run Unit Tests
-      run: build\test_account.exe
+      run: |
+        cd build
+        ctest --output-on-failure
       shell: cmd
 
     - name: Run Program & Coverage
       run: |
-        build\banking_system.exe
+        echo. | build\banking_system.exe
         gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage"
       shell: cmd
 
