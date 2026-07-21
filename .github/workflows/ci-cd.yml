@@ -100,6 +100,10 @@ jobs:
     - name: Create Release Artifacts
       run: |
         copy build\banking_system.exe release\banking_system.exe
+        copy build\test_address.exe release\test_address.exe
+        copy build\test_admin.exe release\test_admin.exe
+        copy build\test_bill_queue.exe release\test_bill_queue.exe
+        copy build\test_cash_queue.exe release\test_cash_queue.exe
         copy build\test_account.exe release\test_account.exe
       shell: cmd
 

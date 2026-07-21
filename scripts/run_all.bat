@@ -37,15 +37,31 @@ gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banki
 
 echo [8/9] Creating Release Artifacts for QA...
 copy build\banking_system.exe release\banking_system.exe
+copy build\test_address.exe release\test_address.exe
+copy build\test_admin.exe release\test_admin.exe
+copy build\test_bill_queue.exe release\test_bill_queue.exe
+copy build\test_cash_queue.exe release\test_cash_queue.exe
 copy build\test_account.exe release\test_account.exe
 
 :: Copy object files from build
 copy build\CMakeFiles\banking_system.dir\src\*.o release\ 2>nul
+copy build\CMakeFiles\test_address.dir\tests\*.o release\ 2>nul
+copy build\CMakeFiles\test_address.dir\src\*.o release\ 2>nul
+copy build\CMakeFiles\test_admin.dir\tests\*.o release\ 2>nul
+copy build\CMakeFiles\test_admin.dir\src\*.o release\ 2>nul
+copy build\CMakeFiles\test_bill_queue.dir\tests\*.o release\ 2>nul
+copy build\CMakeFiles\test_bill_queue.dir\src\*.o release\ 2>nul
+copy build\CMakeFiles\test_cash_queue.dir\tests\*.o release\ 2>nul
+copy build\CMakeFiles\test_cash_queue.dir\src\*.o release\ 2>nul
 copy build\CMakeFiles\test_account.dir\tests\*.o release\ 2>nul
 copy build\CMakeFiles\test_account.dir\src\*.o release\ 2>nul
 
 :: Create .bin files (binary images)
 objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
+objcopy -O binary build\test_address.exe release\test_address.bin 2>nul
+objcopy -O binary build\test_admin.exe release\test_admin.bin 2>nul
+objcopy -O binary build\test_bill_queue.exe release\test_bill_queue.bin 2>nul
+objcopy -O binary build\test_cash_queue.exe release\test_cash_queue.bin 2>nul
 objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
 
 echo [9/9] Pipeline Completed Successfully!
