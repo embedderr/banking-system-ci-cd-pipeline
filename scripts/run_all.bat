@@ -53,17 +53,17 @@ copy build\test_cash_queue.exe release\test_cash_queue.exe
 copy build\test_account.exe release\test_account.exe
 
 :: Copy object files from build
-copy build\CMakeFiles\banking_system.dir\src\*.o release\ 2>nul
-copy build\CMakeFiles\test_address.dir\tests\*.o release\ 2>nul
-copy build\CMakeFiles\test_address.dir\src\*.o release\ 2>nul
-copy build\CMakeFiles\test_admin.dir\tests\*.o release\ 2>nul
-copy build\CMakeFiles\test_admin.dir\src\*.o release\ 2>nul
-copy build\CMakeFiles\test_bill_queue.dir\tests\*.o release\ 2>nul
-copy build\CMakeFiles\test_bill_queue.dir\src\*.o release\ 2>nul
-copy build\CMakeFiles\test_cash_queue.dir\tests\*.o release\ 2>nul
-copy build\CMakeFiles\test_cash_queue.dir\src\*.o release\ 2>nul
-copy build\CMakeFiles\test_account.dir\tests\*.o release\ 2>nul
-copy build\CMakeFiles\test_account.dir\src\*.o release\ 2>nul
+copy build\CMakeFiles\banking_system.dir\src\*.obj release\ 2>nul
+copy build\CMakeFiles\test_address.dir\tests\*.obj release\ 2>nul
+copy build\CMakeFiles\test_address.dir\src\*.obj release\ 2>nul
+copy build\CMakeFiles\test_admin.dir\tests\*.obj release\ 2>nul
+copy build\CMakeFiles\test_admin.dir\src\*.obj release\ 2>nul
+copy build\CMakeFiles\test_bill_queue.dir\tests\*.obj release\ 2>nul
+copy build\CMakeFiles\test_bill_queue.dir\src\*.obj release\ 2>nul
+copy build\CMakeFiles\test_cash_queue.dir\tests\*.obj release\ 2>nul
+copy build\CMakeFiles\test_cash_queue.dir\src\*.obj release\ 2>nul
+copy build\CMakeFiles\test_account.dir\tests\*.obj release\ 2>nul
+copy build\CMakeFiles\test_account.dir\src\*.obj release\ 2>nul
 
 :: Create .bin files (binary images)
 objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
