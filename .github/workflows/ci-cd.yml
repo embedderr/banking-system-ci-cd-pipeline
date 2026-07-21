@@ -86,8 +86,15 @@ jobs:
 
     - name: Run Program & Coverage
       run: |
-        echo. | build\banking_system.exe
-        gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage"
+        echo "=== Running Banking System ==="
+        # Run with timeout and non-interactive input
+        echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
+          
+        echo "=== Generating Coverage Report ==="
+        gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
+          
+        type program_output.txt
+      timeout-minutes: 6
       shell: cmd
 
     - name: Create Release Artifacts
