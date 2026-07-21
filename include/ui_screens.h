@@ -21,13 +21,12 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-
-#include "account.h"
+#include "common.h"
+#include "platform.h"
 #include "address.h"
 #include "bill_queue.h"
 #include "cash_queue.h"
-#include "common.h"
-#include "platform.h"
+#include "account.h"
 
 /* ===================================================================== */
 /* Display Functions                                                      */
@@ -106,8 +105,7 @@ void ui_show_pin_change_result(StatusCode result);
 /** Displays a balance enquiry result. */
 void ui_show_balance(long account_number, Money balance);
 
-/** Displays full details of a single account record (used for self-service view and admin views).
- */
+/** Displays full details of a single account record (used for self-service view and admin views). */
 void ui_show_account_details(const AccountNode *acc);
 
 /** Displays a single bill payment request (used when showing the queue). */
@@ -178,8 +176,8 @@ bool ui_collect_new_account_request(NewAccountInput *out_input);
  * @param password_cap      Capacity, in bytes, of @p out_password.
  * @return true if both fields were read successfully; false otherwise.
  */
-bool ui_collect_login_credentials(char *out_username, size_t username_cap, char *out_password,
-                                  size_t password_cap);
+bool ui_collect_login_credentials(char *out_username, size_t username_cap,
+                                   char *out_password, size_t password_cap);
 
 /**
  * @brief Collects an account number and debit card PIN for ATM login.

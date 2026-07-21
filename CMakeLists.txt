@@ -27,6 +27,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(unity)
 
+# Unity disables double-precision assertions (TEST_ASSERT_EQUAL_DOUBLE) by
+# default, since it targets embedded platforms that may lack hardware
+# double support. Our Money type (common.h) is a double, so this must be
+# explicitly enabled for every target that links against unity.
+target_compile_definitions(unity PUBLIC UNITY_INCLUDE_DOUBLE)
+
 # Main Application
 # NOTE: file(GLOB ...) automatically picks up every .c file placed in
 # src/ -- platform.c, address.c, bill_queue.c, cash_queue.c, account.c,
