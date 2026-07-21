@@ -25,7 +25,9 @@ cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=De
 cmake --build build
 
 echo [5/9] Running Unit Tests...
-build\test_account.exe
+cd build
+ctest --output-on-failure
+cd ..
 
 echo [6/9] Running Main Program...
 build\banking_system.exe
