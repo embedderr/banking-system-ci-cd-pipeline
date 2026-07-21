@@ -14,6 +14,7 @@ on:
 jobs:
   build-and-test:
     runs-on: windows-latest
+    timeout-minutes: 20
 
     steps:
     - uses: actions/checkout@v4
@@ -73,12 +74,14 @@ jobs:
         set PATH=C:\msys64\mingw64\bin;%PATH%
         cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
         cmake --build build
+      timeout-minutes: 10 
       shell: cmd
 
     - name: Run Unit Tests
       run: |
         cd build
         ctest --output-on-failure
+      timeout-minutes: 8
       shell: cmd
 
     - name: Run Program & Coverage
