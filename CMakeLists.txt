@@ -66,6 +66,13 @@ add_executable(test_admin
 target_link_libraries(test_admin unity)
 add_test(NAME test_admin COMMAND test_admin)
 
+add_executable(test_platform
+    tests/test_platform.c
+    src/platform.c
+)
+target_link_libraries(test_platform unity)
+add_test(NAME test_platform COMMAND test_platform)
+
 add_executable(test_bill_queue
     tests/test_bill_queue.c
     src/bill_queue.c
@@ -87,6 +94,23 @@ add_executable(test_account
 )
 target_link_libraries(test_account unity)
 add_test(NAME test_account COMMAND test_account)
+
+# test_ui_screens_internal links the full ui_screens.c, which (via
+# ui_screens.h) depends on platform, address, account, bill_queue, and
+# cash_queue -- all linked in here even though this suite only directly
+# tests ui_screens' internal parsing helpers (see
+# include/ui_screens_internal.h for why this test-only header exists).
+add_executable(test_ui_screens_internal
+    tests/test_ui_screens_internal.c
+    src/ui_screens.c
+    src/platform.c
+    src/address.c
+    src/account.c
+    src/bill_queue.c
+    src/cash_queue.c
+)
+target_link_libraries(test_ui_screens_internal unity)
+add_test(NAME test_ui_screens_internal COMMAND test_ui_screens_internal)
 
 enable_testing()
 
