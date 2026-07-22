@@ -9,6 +9,7 @@
  */
 
 #include "ui_screens.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,10 +18,8 @@
 /* Internal helpers                                                       */
 /* ===================================================================== */
 
-static void print_date_time_header(const SystemTime *time)
-{
-    if (time == NULL)
-    {
+static void print_date_time_header(const SystemTime *time) {
+    if (time == NULL) {
         return;
     }
 
@@ -28,21 +27,29 @@ static void print_date_time_header(const SystemTime *time)
     printf("\t\t\t Time: %d:%02d\n", time->hour, time->minute);
 }
 
-static void print_bank_banner(void)
-{
-    printf("\t\t||===============================================================================||\n");
-    printf("\t\t                           APNA BANK                                               \n");
-    printf("\t\t                                                                                   \n");
-    printf("\t\t  When you see #, it means you should enter a number, such as 1, 2, 3, 4, 5, etc.  \n");
-    printf("\t\t___________________________________________________________________________________\n\n");
+static void print_bank_banner(void) {
+    printf(
+        "\t\t||===============================================================================||"
+        "\n");
+    printf(
+        "\t\t                           APNA BANK                                               "
+        "\n");
+    printf(
+        "\t\t                                                                                   "
+        "\n");
+    printf(
+        "\t\t  When you see #, it means you should enter a number, such as 1, 2, 3, 4, 5, etc.  "
+        "\n");
+    printf(
+        "\t\t___________________________________________________________________________________"
+        "\n\n");
 }
 
 /* ===================================================================== */
 /* Display Functions                                                      */
 /* ===================================================================== */
 
-void ui_show_start_screen(const SystemTime *time)
-{
+void ui_show_start_screen(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||========================================||\n");
     printf("\t\t\t\t\t\t\t||           Welcome to APNA BANK          ||\n");
@@ -50,16 +57,14 @@ void ui_show_start_screen(const SystemTime *time)
     platform_wait_for_keypress();
 }
 
-void ui_show_end_screen(const SystemTime *time)
-{
+void ui_show_end_screen(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||========================================||\n");
     printf("\t\t\t\t\t\t\t||     Thank You for using APNA BANK       ||\n");
     printf("\t\t\t\t\t\t\t||========================================||\n\n");
 }
 
-void ui_show_main_menu_header(const SystemTime *time)
-{
+void ui_show_main_menu_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||========================================||\n");
     printf("\t\t\t\t\t\t\t||                APNA BANK                ||\n");
@@ -71,8 +76,7 @@ void ui_show_main_menu_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||========================================||\n\n");
 }
 
-void ui_show_bank_menu_header(const SystemTime *time)
-{
+void ui_show_bank_menu_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||             Welcome to APNA BANK                  ||\n");
@@ -85,8 +89,7 @@ void ui_show_bank_menu_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_atm_login_header(const SystemTime *time)
-{
+void ui_show_atm_login_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||              Welcome to ATM                       ||\n");
@@ -96,8 +99,7 @@ void ui_show_atm_login_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_atm_menu_header(const SystemTime *time)
-{
+void ui_show_atm_menu_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||              Welcome to ATM                       ||\n");
@@ -109,8 +111,7 @@ void ui_show_atm_menu_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_admin_login_header(const SystemTime *time)
-{
+void ui_show_admin_login_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||              Welcome to Admin                     ||\n");
@@ -120,8 +121,7 @@ void ui_show_admin_login_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_admin_menu_header(const SystemTime *time)
-{
+void ui_show_admin_menu_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||              Welcome to Admin                     ||\n");
@@ -133,8 +133,7 @@ void ui_show_admin_menu_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_admin_account_openings_header(const SystemTime *time)
-{
+void ui_show_admin_account_openings_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||          Welcome to Account Openings              ||\n");
@@ -147,8 +146,7 @@ void ui_show_admin_account_openings_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_admin_bill_payments_header(const SystemTime *time)
-{
+void ui_show_admin_bill_payments_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||           Welcome to Bill Payments                ||\n");
@@ -160,8 +158,7 @@ void ui_show_admin_bill_payments_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_admin_cash_queue_header(const SystemTime *time)
-{
+void ui_show_admin_cash_queue_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
     printf("\t\t\t\t\t\t\t||         Welcome to Cash Transactions              ||\n");
@@ -173,16 +170,14 @@ void ui_show_admin_cash_queue_header(const SystemTime *time)
     printf("\t\t\t\t\t\t\t||===================================================||\n\n");
 }
 
-void ui_show_invalid_option_message(const SystemTime *time)
-{
+void ui_show_invalid_option_message(const SystemTime *time) {
     print_date_time_header(time);
     print_bank_banner();
     printf("\t\t\t\t Wrong Option Entered, press any key to go back to Menu\n");
     platform_wait_for_keypress();
 }
 
-void ui_show_invalid_credentials_message(const SystemTime *time)
-{
+void ui_show_invalid_credentials_message(const SystemTime *time) {
     print_date_time_header(time);
     print_bank_banner();
     printf("\t\t\t\t # Invalid Credentials Entered\n");
@@ -194,10 +189,8 @@ void ui_show_invalid_credentials_message(const SystemTime *time)
 /* Result / Feedback Display Functions                                    */
 /* ===================================================================== */
 
-void ui_show_bill_enqueue_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_bill_enqueue_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\t Transaction Completed, Bill payment in process.\n");
             break;
@@ -212,10 +205,8 @@ void ui_show_bill_enqueue_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_bill_process_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_bill_process_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\t Bill payment at front of queue has been processed.\n");
             break;
@@ -230,10 +221,8 @@ void ui_show_bill_process_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_cash_enqueue_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_cash_enqueue_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\t Transaction Completed.\n");
             break;
@@ -248,10 +237,8 @@ void ui_show_cash_enqueue_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_cash_process_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_cash_process_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\t Cash request at front of queue has been processed.\n");
             break;
@@ -272,10 +259,8 @@ void ui_show_cash_process_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_account_request_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_account_request_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\t Account Details Completed, in process now.\n");
             break;
@@ -293,29 +278,20 @@ void ui_show_account_request_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_account_decision_result(StatusCode result, bool approved)
-{
-    if (result == STATUS_OK)
-    {
-        if (approved)
-        {
+void ui_show_account_decision_result(StatusCode result, bool approved) {
+    if (result == STATUS_OK) {
+        if (approved) {
             printf("\t\t\t\t Account approved and a new account number has been assigned.\n");
-        }
-        else
-        {
+        } else {
             printf("\t\t\t\t Account declined.\n");
         }
-    }
-    else
-    {
+    } else {
         printf("\t\t\t\t ERROR! Could not process this account.\n");
     }
 }
 
-void ui_show_account_delete_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_account_delete_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\t Account found in database and successfully deleted.\n");
             break;
@@ -330,10 +306,8 @@ void ui_show_account_delete_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_withdrawal_result(StatusCode result, Money remaining_balance)
-{
-    switch (result)
-    {
+void ui_show_withdrawal_result(StatusCode result, Money remaining_balance) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\tTransaction successful!\n");
             printf("\t\t\t\tRemaining Balance -> %.2f\n", remaining_balance);
@@ -352,10 +326,8 @@ void ui_show_withdrawal_result(StatusCode result, Money remaining_balance)
     platform_wait_for_keypress();
 }
 
-void ui_show_pin_change_result(StatusCode result)
-{
-    switch (result)
-    {
+void ui_show_pin_change_result(StatusCode result) {
+    switch (result) {
         case STATUS_OK:
             printf("\t\t\t\tProcess successful! PIN Updated.\n");
             break;
@@ -370,30 +342,34 @@ void ui_show_pin_change_result(StatusCode result)
     platform_wait_for_keypress();
 }
 
-void ui_show_balance(long account_number, Money balance)
-{
+void ui_show_balance(long account_number, Money balance) {
     printf("\t\t\t\tAccount# -> %ld\n", account_number);
     printf("\t\t\t\tBalance -> %.2f\n", balance);
     printf("\t\t\t\tPress any key to return to Bank Menu\n");
     platform_wait_for_keypress();
 }
 
-void ui_show_account_details(const AccountNode *acc)
-{
+void ui_show_account_details(const AccountNode *acc) {
     const char *status_text;
 
-    if (acc == NULL)
-    {
+    if (acc == NULL) {
         printf("\t\t\t\tAccount not found in database.\n");
         return;
     }
 
-    switch (acc->status)
-    {
-        case ACCOUNT_STATUS_PENDING:   status_text = "Pending";   break;
-        case ACCOUNT_STATUS_COMPLETED: status_text = "Completed"; break;
-        case ACCOUNT_STATUS_DECLINED:  status_text = "Declined";  break;
-        default:                       status_text = "Unknown";   break;
+    switch (acc->status) {
+        case ACCOUNT_STATUS_PENDING:
+            status_text = "Pending";
+            break;
+        case ACCOUNT_STATUS_COMPLETED:
+            status_text = "Completed";
+            break;
+        case ACCOUNT_STATUS_DECLINED:
+            status_text = "Declined";
+            break;
+        default:
+            status_text = "Unknown";
+            break;
     }
 
     printf("\t\t\t\t------------------------------\n");
@@ -413,10 +389,8 @@ void ui_show_account_details(const AccountNode *acc)
     printf("\t\t\t\t------------------------------\n\n");
 }
 
-void ui_show_bill_request(const BillRequestInput *req, int index)
-{
-    if (req == NULL)
-    {
+void ui_show_bill_request(const BillRequestInput *req, int index) {
+    if (req == NULL) {
         return;
     }
 
@@ -427,10 +401,8 @@ void ui_show_bill_request(const BillRequestInput *req, int index)
     printf("\t\t\t\t-----------------------------------\n\n");
 }
 
-void ui_show_cash_request(const CashRequestInput *req, int index)
-{
-    if (req == NULL)
-    {
+void ui_show_cash_request(const CashRequestInput *req, int index) {
+    if (req == NULL) {
         return;
     }
 
@@ -441,15 +413,13 @@ void ui_show_cash_request(const CashRequestInput *req, int index)
     printf("\t\t\t\t-----------------------------------\n\n");
 }
 
-void ui_show_queue_empty_message(const char *queue_label)
-{
+void ui_show_queue_empty_message(const char *queue_label) {
     printf("\t\t\t\t %s Queue is empty\n", (queue_label != NULL) ? queue_label : "The");
     printf("\t\t\t\t Press any key to return to Bank Menu\n");
     platform_wait_for_keypress();
 }
 
-void ui_show_database_empty_message(void)
-{
+void ui_show_database_empty_message(void) {
     printf("\t\t\t\t Account Database is empty\n");
     printf("\t\t\t\t Press any key to return to Bank Menu\n");
     platform_wait_for_keypress();
@@ -467,18 +437,15 @@ void ui_show_database_empty_message(void)
  *
  * @return true if a line was successfully read; false on EOF or error.
  */
-bool read_line(char *buffer, size_t size)
-{
+bool read_line(char *buffer, size_t size) {
     size_t len;
 
-    if (fgets(buffer, (int)size, stdin) == NULL)
-    {
+    if (fgets(buffer, (int)size, stdin) == NULL) {
         return false;
     }
 
     len = strlen(buffer);
-    if ((len > 0U) && (buffer[len - 1U] == '\n'))
-    {
+    if ((len > 0U) && (buffer[len - 1U] == '\n')) {
         buffer[len - 1U] = '\0';
     }
 
@@ -491,19 +458,16 @@ bool read_line(char *buffer, size_t size)
  *        (SRS-027: reject invalid numeric input rather than proceeding
  *        with an indeterminate value).
  */
-bool parse_long(const char *str, long *out)
-{
+bool parse_long(const char *str, long *out) {
     char *end_ptr;
     long value;
 
-    if ((str == NULL) || (str[0] == '\0'))
-    {
+    if ((str == NULL) || (str[0] == '\0')) {
         return false;
     }
 
     value = strtol(str, &end_ptr, 10);
-    if (*end_ptr != '\0')
-    {
+    if (*end_ptr != '\0') {
         return false;
     }
 
@@ -511,12 +475,10 @@ bool parse_long(const char *str, long *out)
     return true;
 }
 
-bool parse_int(const char *str, int *out)
-{
+bool parse_int(const char *str, int *out) {
     long value;
 
-    if (!parse_long(str, &value))
-    {
+    if (!parse_long(str, &value)) {
         return false;
     }
 
@@ -524,19 +486,16 @@ bool parse_int(const char *str, int *out)
     return true;
 }
 
-bool parse_long_long(const char *str, long long *out)
-{
+bool parse_long_long(const char *str, long long *out) {
     char *end_ptr;
     long long value;
 
-    if ((str == NULL) || (str[0] == '\0'))
-    {
+    if ((str == NULL) || (str[0] == '\0')) {
         return false;
     }
 
     value = strtoll(str, &end_ptr, 10);
-    if (*end_ptr != '\0')
-    {
+    if (*end_ptr != '\0') {
         return false;
     }
 
@@ -544,19 +503,16 @@ bool parse_long_long(const char *str, long long *out)
     return true;
 }
 
-bool parse_double(const char *str, double *out)
-{
+bool parse_double(const char *str, double *out) {
     char *end_ptr;
     double value;
 
-    if ((str == NULL) || (str[0] == '\0'))
-    {
+    if ((str == NULL) || (str[0] == '\0')) {
         return false;
     }
 
     value = strtod(str, &end_ptr);
-    if (*end_ptr != '\0')
-    {
+    if (*end_ptr != '\0') {
         return false;
     }
 
@@ -568,12 +524,10 @@ bool parse_double(const char *str, double *out)
  * @brief Copies @p src into @p dest if it fits (including the null
  *        terminator); rejects (returns false) rather than truncating.
  */
-bool copy_bounded(char *dest, size_t dest_size, const char *src)
-{
+bool copy_bounded(char *dest, size_t dest_size, const char *src) {
     size_t src_len = strlen(src);
 
-    if (src_len >= dest_size)
-    {
+    if (src_len >= dest_size) {
         return false;
     }
 
@@ -585,292 +539,382 @@ bool copy_bounded(char *dest, size_t dest_size, const char *src)
 /* Collection Functions                                                   */
 /* ===================================================================== */
 
-bool ui_collect_menu_choice(int *out_choice)
-{
+bool ui_collect_menu_choice(int *out_choice) {
     char line[UI_LINE_BUFFER_SIZE];
 
     printf("\t\t\t\t\t\tEnter Option: ");
-    if (!read_line(line, sizeof(line)))
-    {
+    if (!read_line(line, sizeof(line))) {
         return false;
     }
 
     return parse_int(line, out_choice);
 }
 
-bool ui_confirm_yes_no(const char *prompt_message)
-{
+bool ui_confirm_yes_no(const char *prompt_message) {
     char line[UI_LINE_BUFFER_SIZE];
 
-    if (prompt_message != NULL)
-    {
+    if (prompt_message != NULL) {
         printf("\t\t\t\t %s (Y/N): ", prompt_message);
     }
 
-    if (!read_line(line, sizeof(line)))
-    {
+    if (!read_line(line, sizeof(line))) {
         return false;
     }
 
     return (line[0] == 'y') || (line[0] == 'Y');
 }
 
-bool ui_collect_bill_request(BillRequestInput *out_input)
-{
+bool ui_collect_bill_request(BillRequestInput *out_input) {
     char line[UI_LINE_BUFFER_SIZE];
     long invoice_number;
     double amount;
 
-    if (out_input == NULL)
-    {
+    if (out_input == NULL) {
         return false;
     }
 
     printf("\t\t\t\t Bill Type (Electricity, Gas, Internet) -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->bill_type, sizeof(out_input->bill_type), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->bill_type, sizeof(out_input->bill_type), line)) {
+        return false;
+    }
 
     printf("\t\t\t\t Invoice Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long(line, &invoice_number)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long(line, &invoice_number)) {
+        return false;
+    }
     out_input->invoice_number = invoice_number;
 
     printf("\t\t\t\t Bill Amount -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_double(line, &amount)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_double(line, &amount)) {
+        return false;
+    }
     out_input->amount = amount;
 
     return true;
 }
 
-bool ui_collect_cash_request(CashRequestInput *out_input)
-{
+bool ui_collect_cash_request(CashRequestInput *out_input) {
     char line[UI_LINE_BUFFER_SIZE];
     int type_choice;
     long account_number;
     double amount;
 
-    if (out_input == NULL)
-    {
+    if (out_input == NULL) {
         return false;
     }
 
     printf("\t\t\t\t 1) Withdraw Cash  2) Deposit Cash -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_int(line, &type_choice)) { return false; }
-    if (type_choice == 1) { out_input->type = CASH_TXN_WITHDRAW; }
-    else if (type_choice == 2) { out_input->type = CASH_TXN_DEPOSIT; }
-    else { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_int(line, &type_choice)) {
+        return false;
+    }
+    if (type_choice == 1) {
+        out_input->type = CASH_TXN_WITHDRAW;
+    } else if (type_choice == 2) {
+        out_input->type = CASH_TXN_DEPOSIT;
+    } else {
+        return false;
+    }
 
     printf("\t\t\t\t Account Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long(line, &account_number)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long(line, &account_number)) {
+        return false;
+    }
     out_input->account_number = account_number;
 
     printf("\t\t\t\t Cash Amount -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_double(line, &amount)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_double(line, &amount)) {
+        return false;
+    }
     out_input->amount = amount;
 
     return true;
 }
 
-bool ui_collect_new_account_request(NewAccountInput *out_input)
-{
+bool ui_collect_new_account_request(NewAccountInput *out_input) {
     char line[UI_LINE_BUFFER_SIZE];
     long temp_long;
     long long temp_ll;
     int debit_choice;
     int cheque_choice;
 
-    if (out_input == NULL)
-    {
+    if (out_input == NULL) {
         return false;
     }
 
     address_init(&out_input->home_address);
 
     printf("\t\t\t\t First Name -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->first_name, sizeof(out_input->first_name), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->first_name, sizeof(out_input->first_name), line)) {
+        return false;
+    }
 
     printf("\t\t\t\t Last Name -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->last_name, sizeof(out_input->last_name), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->last_name, sizeof(out_input->last_name), line)) {
+        return false;
+    }
 
     printf("\t\t\t\t Email Address -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->email, sizeof(out_input->email), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->email, sizeof(out_input->email), line)) {
+        return false;
+    }
 
     printf("\t\t\t\t House Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long(line, &temp_long)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long(line, &temp_long)) {
+        return false;
+    }
     out_input->home_address.house_number = (int)temp_long;
 
     printf("\t\t\t\t Town Name -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->home_address.town_name, sizeof(out_input->home_address.town_name), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->home_address.town_name, sizeof(out_input->home_address.town_name),
+                      line)) {
+        return false;
+    }
 
     printf("\t\t\t\t Street Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long(line, &temp_long)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long(line, &temp_long)) {
+        return false;
+    }
     out_input->home_address.street_number = (int)temp_long;
 
     printf("\t\t\t\t City -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->home_address.city, sizeof(out_input->home_address.city), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->home_address.city, sizeof(out_input->home_address.city), line)) {
+        return false;
+    }
 
     printf("\t\t\t\t Phone Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long_long(line, &temp_ll)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long_long(line, &temp_ll)) {
+        return false;
+    }
     out_input->phone_number = temp_ll;
 
     printf("\t\t\t\t Aadhaar Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long_long(line, &temp_ll)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long_long(line, &temp_ll)) {
+        return false;
+    }
     out_input->aadhaar_number = temp_ll;
 
     printf("\t\t\t\t Debit Card? 1=Yes 0=No -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_int(line, &debit_choice)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_int(line, &debit_choice)) {
+        return false;
+    }
 
-    if (debit_choice == 1)
-    {
+    if (debit_choice == 1) {
         int pin;
         out_input->wants_debit_card = true;
         printf("\t\t\t\t Debit Card PIN (4 digits) -> ");
-        if (!read_line(line, sizeof(line))) { return false; }
-        if (!parse_int(line, &pin)) { return false; }
+        if (!read_line(line, sizeof(line))) {
+            return false;
+        }
+        if (!parse_int(line, &pin)) {
+            return false;
+        }
         out_input->debit_card_pin = pin;
-    }
-    else
-    {
+    } else {
         out_input->wants_debit_card = false;
         out_input->debit_card_pin = 0;
     }
 
     printf("\t\t\t\t Cheque Book? 1=Yes 0=No -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_int(line, &cheque_choice)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_int(line, &cheque_choice)) {
+        return false;
+    }
     out_input->wants_cheque_book = (cheque_choice == 1);
 
     printf("\t\t\t\t Desired Username (no spaces) -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->username, sizeof(out_input->username), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->username, sizeof(out_input->username), line)) {
+        return false;
+    }
 
     printf("\t\t\t\t Desired Password (no spaces) -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_input->password, sizeof(out_input->password), line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_input->password, sizeof(out_input->password), line)) {
+        return false;
+    }
 
     return true;
 }
 
-bool ui_collect_login_credentials(char *out_username, size_t username_cap,
-                                   char *out_password, size_t password_cap)
-{
+bool ui_collect_login_credentials(char *out_username, size_t username_cap, char *out_password,
+                                  size_t password_cap) {
     char line[UI_LINE_BUFFER_SIZE];
 
-    if ((out_username == NULL) || (out_password == NULL))
-    {
+    if ((out_username == NULL) || (out_password == NULL)) {
         return false;
     }
 
     printf("\t\t\t Enter Username: ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_username, username_cap, line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_username, username_cap, line)) {
+        return false;
+    }
 
     printf("\t\t\t Enter Password: ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!copy_bounded(out_password, password_cap, line)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!copy_bounded(out_password, password_cap, line)) {
+        return false;
+    }
 
     return true;
 }
 
-bool ui_collect_atm_login(long *out_account_number, int *out_pin)
-{
+bool ui_collect_atm_login(long *out_account_number, int *out_pin) {
     char line[UI_LINE_BUFFER_SIZE];
     long account_number;
     int pin;
 
-    if ((out_account_number == NULL) || (out_pin == NULL))
-    {
+    if ((out_account_number == NULL) || (out_pin == NULL)) {
         return false;
     }
 
     printf("\t\t\t\t Account Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long(line, &account_number)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long(line, &account_number)) {
+        return false;
+    }
 
     printf("\t\t\t\t Debit Card PIN -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_int(line, &pin)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_int(line, &pin)) {
+        return false;
+    }
 
     *out_account_number = account_number;
     *out_pin = pin;
     return true;
 }
 
-bool ui_collect_pin_change(int *out_old_pin, int *out_new_pin)
-{
+bool ui_collect_pin_change(int *out_old_pin, int *out_new_pin) {
     char line[UI_LINE_BUFFER_SIZE];
     int old_pin;
     int new_pin;
 
-    if ((out_old_pin == NULL) || (out_new_pin == NULL))
-    {
+    if ((out_old_pin == NULL) || (out_new_pin == NULL)) {
         return false;
     }
 
     printf("\t\t\t\t Old PIN -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_int(line, &old_pin)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_int(line, &old_pin)) {
+        return false;
+    }
 
     printf("\t\t\t\t New PIN (4 digits) -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_int(line, &new_pin)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_int(line, &new_pin)) {
+        return false;
+    }
 
     *out_old_pin = old_pin;
     *out_new_pin = new_pin;
     return true;
 }
 
-bool ui_collect_withdrawal_amount(Money *out_amount)
-{
+bool ui_collect_withdrawal_amount(Money *out_amount) {
     char line[UI_LINE_BUFFER_SIZE];
     double amount;
 
-    if (out_amount == NULL)
-    {
+    if (out_amount == NULL) {
         return false;
     }
 
     printf("\t\t\t\t Amount to withdraw -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_double(line, &amount)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_double(line, &amount)) {
+        return false;
+    }
 
     *out_amount = amount;
     return true;
 }
 
-bool ui_collect_account_number(long *out_account_number)
-{
+bool ui_collect_account_number(long *out_account_number) {
     char line[UI_LINE_BUFFER_SIZE];
     long account_number;
 
-    if (out_account_number == NULL)
-    {
+    if (out_account_number == NULL) {
         return false;
     }
 
     printf("\t\t\t\t Account Number -> ");
-    if (!read_line(line, sizeof(line))) { return false; }
-    if (!parse_long(line, &account_number)) { return false; }
+    if (!read_line(line, sizeof(line))) {
+        return false;
+    }
+    if (!parse_long(line, &account_number)) {
+        return false;
+    }
 
     *out_account_number = account_number;
     return true;
 }
 
-bool ui_is_input_exhausted(void)
-{
-    return feof(stdin) != 0;
-}
+bool ui_is_input_exhausted(void) { return feof(stdin) != 0; }

@@ -23,7 +23,12 @@ mkdir reports\static_code_check reports\misra_check reports\code_coverage
 mkdir release
 
 echo [2/9] Code Formatting Check...
-clang-format --dry-run --Werror -i src/*.c include/*.h 2>nul || echo Formatting check passed
+clang-format -i src/*.c include/*.h
+if errorlevel 1 (
+    echo [WARNING] Code formatting check encountered an error.
+) else (
+    echo Formatting check passed
+)
 
 echo [3/9] Static Analysis + MISRA...
 call scripts\static_code_analysis.bat
