@@ -7,8 +7,8 @@
 # Coverage
 *.gcda
 *.gcno
-#coverage.*
-#reports/*
+coverage.*
+reports/*
 
 # CMake
 build/
