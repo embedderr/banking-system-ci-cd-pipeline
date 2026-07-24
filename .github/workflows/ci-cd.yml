@@ -1,5 +1,10 @@
 name: Banking System CI/CD
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main, develop, 'release/*' ]
@@ -9,6 +14,7 @@ on:
 jobs:
   build-and-test:
     runs-on: windows-latest
+    timeout-minutes: 20
 
     steps:
     - uses: actions/checkout@v4
@@ -68,22 +74,45 @@ jobs:
         set PATH=C:\msys64\mingw64\bin;%PATH%
         cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
         cmake --build build
+      timeout-minutes: 10 
       shell: cmd
 
     - name: Run Unit Tests
-      run: build\test_account.exe
+      run: |
+        cd build
+        ctest --output-on-failure
+      timeout-minutes: 8
       shell: cmd
 
     - name: Run Program & Coverage
       run: |
-        build\banking_system.exe
-        gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage"
+        echo "=== Running Banking System ==="
+        # Run with timeout and non-interactive input
+        echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
+          
+        echo "=== Generating Coverage Report ==="
+        gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
+          
+        type program_output.txt
+      timeout-minutes: 6
       shell: cmd
 
     - name: Create Release Artifacts
       run: |
+        set PATH=C:\msys64\mingw64\bin;%PATH%
         copy build\banking_system.exe release\banking_system.exe
+        copy build\test_address.exe release\test_address.exe
+        copy build\test_admin.exe release\test_admin.exe
+        copy build\test_bill_queue.exe release\test_bill_queue.exe
+        copy build\test_cash_queue.exe release\test_cash_queue.exe
         copy build\test_account.exe release\test_account.exe
+
+        objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
+        objcopy -O binary build\test_address.exe release\test_address.bin 2>nul
+        objcopy -O binary build\test_admin.exe release\test_admin.bin 2>nul
+        objcopy -O binary build\test_bill_queue.exe release\test_bill_queue.bin 2>nul
+        objcopy -O binary build\test_cash_queue.exe release\test_cash_queue.bin 2>nul
+        objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
       shell: cmd
 
     - name: Upload All Reports and Release Artifacts

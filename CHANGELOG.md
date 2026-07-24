@@ -4,6 +4,63 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [v9.0.0-rc1] - 2026-07-24
+
+- update CHANGELOG.md for v8.0.0 [skip ci]
+
+- updated README.md file with some missing git cmds I used and TO DO list at the end
+
+- improved banking system with new features
+
+- fixed CMakeLists.txt in the root dir
+
+- fixed ui_screens.h in incliude - formatting - clang-format -i src\*.c include\*.h
+
+- fixed ci-cd.yml file by adding concurrency block on top of this file
+
+- updated .github/workflows/ci-cd.yml - added timeouts
+
+- updated .github/workflows/ci-cd.yml - fixed Run Program and Coverage block
+
+- inside run_all.bat - should use ctest so local runs get the same coverage as CI — all 5 suites, not just test_account
+
+- bin files which are generated when local run are added
+
+- fixed ci-cd.yml and run_all.bat files to get all unit test .exe/.bin files in release folder as well in ci build artifacts
+
+- updated ci-cd.yml file for generating .bin files too
+
+- added release folder
+
+- fixed all bat files in scripts dir
+
+- adding all bin files which are in release dir
+
+- added release folder which has bin files - these bin files are created when I run the project locally
+
+- fixed run_all.bat file for creating and copying other executables in release folder
+
+- add platform and UI screens tests + internal header
+
+- adding release folder which has .bin files generated after local build
+
+- remove flawed platform_wait_for_keypress unit test that hangs on Windows
+
+- fixed clang format bug for src/ui_screens.c and updated scripts/run_all.bat file
+
+- updated README.md file
+
+- .bin files are added becoz local was executed
+
+- updated documents docs/README.md docs/design/HLD.md docs/design/LLD.md
+
+- updated .gitignore file to push docs/testing, release/*.exe files, reports
+
+- updated README.md file of root folder
+
+- just updated .gitignore file
+
+- just a final branch push
 ## [v8.0.0] - 2026-07-19
 
 - update CHANGELOG.md for v8.0.0-rc1 [skip ci]

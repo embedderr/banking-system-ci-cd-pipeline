@@ -5,6 +5,15 @@ echo ================================================
 
 cd /d "%~dp0\.."
 
+set "PYCMD="
+for /f "delims=" %%P in ('where python 2^>nul') do (
+    echo %%P | findstr /i "msys64" >nul
+    if errorlevel 1 (
+        if not defined PYCMD set "PYCMD=%%P"
+    )
+)
+if not defined PYCMD set "PYCMD=python"
+
 :: Clean old reports
 rd /s /q reports\static_code_check reports\misra_check 2>nul
 mkdir reports\static_code_check reports\misra_check
@@ -20,13 +29,13 @@ echo [2/3] Running MISRA Check...
 cppcheck --xml --enable=all --std=c99 %includes% --platform=%platfrm% --addon=./static_code_analysis/misra-config.json %files% --output-file=reports\misra_check\MISRA_file.xml
 
 echo [3/3] Generating HTML Reports...
-python ./static_code_analysis/htmlreport/cppcheck-htmlreport ^
+%PYCMD% ./static_code_analysis/htmlreport/cppcheck-htmlreport ^
   --file=reports\misra_check\MISRA_file.xml ^
   --title=Banking_System ^
   --report-dir=./reports/misra_check ^
   --source-dir=.
 
-python ./static_code_analysis/htmlreport/cppcheck-htmlreport ^
+%PYCMD% ./static_code_analysis/htmlreport/cppcheck-htmlreport ^
   --file=reports\static_code_check\static_file.xml ^
   --title=Banking_System ^
   --report-dir=./reports/static_code_check ^

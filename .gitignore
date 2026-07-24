@@ -1,5 +1,5 @@
 # Build artifacts
-*.exe
+#*.exe
 *.o
 *.obj
 *.out
@@ -15,7 +15,7 @@ build/
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
-Testing/
+#Testing/
 Makefile
 cmake_install.cmake
 
