@@ -1,0 +1,663 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Cppcheck - HTML report - Banking_System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+    </style>
+    <script>
+      function getStyle(el, styleProp) {
+        var y;
+
+        if (el.currentStyle) {
+          y = el.currentStyle[styleProp];
+        } else if (window.getComputedStyle) {
+          y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+        }
+
+        return y;
+      }
+
+      function toggle() {
+        var el = this.expandable_content;
+        var mark = this.expandable_marker;
+
+        if (el.style.display === "block") {
+          el.style.display = "none";
+          mark.textContent = "[+]";
+        } else {
+          el.style.display = "block";
+          mark.textContent = "[-]";
+        }
+      }
+
+      function initExpandables() {
+        var elements = document.querySelectorAll(".expandable");
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          var el = elements[i];
+          var clickable = el.querySelector("span");
+          var marker = clickable.querySelector(".marker");
+          var content = el.querySelector(".content");
+          var width = clickable.clientWidth - parseInt(getStyle(content, "padding-left")) - parseInt(getStyle(content, "padding-right"));
+          content.style.width = width + "px";
+          clickable.expandable_content = content;
+          clickable.expandable_marker = marker;
+          clickable.addEventListener("click", toggle);
+        }
+      }
+
+      function toggleDisplay(cb) {
+        var elements = document.querySelectorAll("." + cb.id);
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          elements[i].classList.toggle("id-filtered", !cb.checked);
+        }
+
+        updateFileRows();
+      }
+
+      function toggleSeverity(cb) {
+        cb.parentElement.classList.toggle("unchecked", !cb.checked);
+        var elements = document.querySelectorAll(".sev_" + cb.id);
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          elements[i].classList.toggle("severity-filtered", !cb.checked);
+        }
+
+        updateFileRows();
+      }
+
+      function toggleTool(cb) {
+        cb.parentElement.classList.toggle("unchecked", !cb.checked);
+
+        var elements;
+        if (cb.id == "clang-tidy")
+            elements = document.querySelectorAll("[class^=clang-tidy-]");
+        else
+            elements = document.querySelectorAll(".issue:not([class^=clang-tidy-])");
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          elements[i].classList.toggle("tool-filtered", !cb.checked);
+        }
+
+        updateFileRows();
+      }
+
+      function toggleAll() {
+        var elements = document.querySelectorAll(".idToggle");
+
+        // starting from 1 since 0 is the "toggle all" input
+        for (var i = 1, len = elements.length; i < len; i++) {
+          var changed = elements[i].checked != elements[0].checked;
+          if (changed) {
+            elements[i].checked = elements[0].checked;
+            toggleDisplay(elements[i]);
+          }
+        }
+      }
+
+      function filterFile(filter) {
+        var elements = document.querySelectorAll(".fileEntry");
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          var visible = elements[i].querySelector("tr").querySelector("td").textContent.toLowerCase().includes(filter.toLowerCase());
+          elements[i].classList.toggle("text-filtered", !visible);
+        }
+      }
+
+      function filterText(text) {
+        filter = text.toLowerCase();
+        var elements = document.querySelectorAll(".issue");
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          var visible = false;
+          var fields = elements[i].querySelectorAll("td");
+          for (var n = 0, num = fields.length; n < num; n++) {
+            if (fields[n].textContent.toLowerCase().includes(filter)) {
+              visible = true;
+              break;
+            }
+          }
+          elements[i].classList.toggle("text-filtered", !visible);
+        }
+
+        updateFileRows();
+      }
+
+      function updateFileRows(element) {
+        var elements = document.querySelectorAll(".fileEntry");
+
+        for (var i = 0, len = elements.length; i < len; i++) {
+          var visible = elements[i].querySelector(".issue:not(.id-filtered):not(.severity-filtered):not(.tool-filtered):not(.text-filtered)");
+          elements[i].classList.toggle("file-filtered", !visible);
+        }
+      }
+
+      window.addEventListener("load", initExpandables);
+    </script>
+  </head>
+  <body>
+    <div id="wrapper">
+    <div id="header" class="header">
+      <h1>Cppcheck report - Banking_System</h1>
+      <div id="filters">
+
+        <label class="checkBtn disabled"><input type="checkbox" onclick="toggleSeverity(this)" id="error"disabled/>error</label>
+        <label class="checkBtn disabled"><input type="checkbox" onclick="toggleSeverity(this)" id="warning"disabled/>warning</label>
+        <label class="checkBtn disabled"><input type="checkbox" onclick="toggleSeverity(this)" id="portability"disabled/>portability</label>
+        <label class="checkBtn disabled"><input type="checkbox" onclick="toggleSeverity(this)" id="performance"disabled/>performance</label>
+        <label class="checkBtn"><input type="checkbox" onclick="toggleSeverity(this)" id="style"checked/>style</label>
+        <label class="checkBtn"><input type="checkbox" onclick="toggleSeverity(this)" id="information"checked/>information</label>
+        | 
+        <label class="checkBtn"><input type="checkbox" onclick="toggleTool(this)" id="cppcheck"checked/>cppcheck</label>
+        <label class="checkBtn disabled"><input type="checkbox" onclick="toggleTool(this)" id="clang-tidy"disabled/>clang-tidy</label>
+        | 
+        <label class="severityHeader">File: <input type="text" oninput="filterFile(this.value)"/></label>
+        <label class="severityHeader">Filter: <input type="text" oninput="filterText(this.value)"/></label>
+      </div>
+
+    </div>
+
+    <div id="menu_index">
+     <p><a href="index.html">Defect summary</a> </p>
+
+       <label><input type="checkbox" class="idToggle" onclick="toggleAll()" checked> Toggle all</label>
+       <table>
+           <tr><th>Show</th><th>#</th><th>Defect ID</th></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-17-7" name="misra-c2012-17-7" checked></td><td>193</td><td>misra-c2012-17.7</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-15-5" name="misra-c2012-15-5" checked></td><td>166</td><td>misra-c2012-15.5</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="missingIncludeSystem" name="missingIncludeSystem" checked></td><td>24</td><td>missingIncludeSystem</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-21-3" name="misra-c2012-21-3" checked></td><td>9</td><td>misra-c2012-21.3</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-8-4" name="misra-c2012-8-4" checked></td><td>6</td><td>misra-c2012-8.4</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-21-6" name="misra-c2012-21-6" checked></td><td>4</td><td>misra-c2012-21.6</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="unusedFunction" name="unusedFunction" checked></td><td>4</td><td>unusedFunction</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-22-8" name="misra-c2012-22-8" checked></td><td>3</td><td>misra-c2012-22.8</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-22-9" name="misra-c2012-22-9" checked></td><td>3</td><td>misra-c2012-22.9</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="constParameterPointer" name="constParameterPointer" checked></td><td>2</td><td>constParameterPointer</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-11-8" name="misra-c2012-11-8" checked></td><td>2</td><td>misra-c2012-11.8</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-21-21" name="misra-c2012-21-21" checked></td><td>2</td><td>misra-c2012-21.21</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-8-7" name="misra-c2012-8-7" checked></td><td>2</td><td>misra-c2012-8.7</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-8-9" name="misra-c2012-8-9" checked></td><td>2</td><td>misra-c2012-8.9</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="checkersReport" name="checkersReport" checked></td><td>1</td><td>checkersReport</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="constVariablePointer" name="constVariablePointer" checked></td><td>1</td><td>constVariablePointer</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="misra-c2012-21-10" name="misra-c2012-21-10" checked></td><td>1</td><td>misra-c2012-21.10</td></tr>
+            <tr><td><input type="checkbox" class="idToggle" onclick="toggleDisplay(this)" id="normalCheckLevelMaxBranches" name="normalCheckLevelMaxBranches" checked></td><td>1</td><td>normalCheckLevelMaxBranches</td></tr>
+           <tr><td></td><td>426</td><td>total</td></tr>
+       </table>
+       <p><a href="stats.html">Statistics</a></p>
+    </div>
+    <div id="content_index">
+
+       <table class="summaryTable">
+       <tr><th>Line</th><th>Id</th><th>CWE</th><th>Severity</th><th>Message</th></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="14.html"></a></td></tr>
+         <tr class="checkersReport sev_information issue"><td></td><td>checkersReport</td><td></td><td>information</td><td>Active checkers: 109/802 (use --checkers-report=&lt;filename&gt; to see details)</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="0.html">include\account.h</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="0.html#line-18">18</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="4.html">include\admin.h</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="4.html#line-12">12</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="6.html">include\bill_queue.h</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="6.html#line-16">16</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="8.html">include\cash_queue.h</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="8.html#line-22">22</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="1.html">include\common.h</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="1.html#line-18">18</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stddef.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="11.html">include\ui_screens.h</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="11.html#line-22">22</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="11.html#line-23">23</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stddef.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="2.html">src\account.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="2.html#line-8">8</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="2.html#line-9">9</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-20">20</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-32">32</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="2.html#line-38">38</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-8-7 sev_style issue"><td><a href="2.html#line-46">46</a></td><td>misra-c2012-8.7</td><td></td><td>style</td><td>Functions and objects should not be defined with external linkage if they are referenced in only one translation unit</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-50">50</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-56">56</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-68">68</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-72">72</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-77">77</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="2.html#line-80">80</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-82">82</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-108">108</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-114">114</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-126">126</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-132">132</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-8-7 sev_style issue"><td><a href="2.html#line-140">140</a></td><td>misra-c2012-8.7</td><td></td><td>style</td><td>Functions and objects should not be defined with external linkage if they are referenced in only one translation unit</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-145">145</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="constParameterPointer sev_style issue"><td><a href="2.html#line-159">159</a></td><td>constParameterPointer</td><td><a href="https://cwe.mitre.org/data/definitions/398.html">398</a></td><td>style</td><td>Parameter &apos;db&apos; can be declared as pointer to const</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-163">163</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-181">181</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-193">193</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="2.html#line-212">212</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-213">213</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-226">226</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-234">234</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-246">246</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-254">254</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-266">266</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-274">274</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-286">286</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-293">293</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-303">303</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-307">307</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-317">317</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-327">327</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-331">331</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-335">335</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-345">345</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-355">355</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="2.html#line-363">363</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="3.html">src\address.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="3.html#line-8">8</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-21-6 sev_style issue"><td><a href="3.html#line-8">8</a></td><td>misra-c2012-21.6</td><td></td><td>style</td><td>The standard input/output functions shall not be used.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="3.html#line-9">9</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="3.html#line-13">13</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="3.html#line-24">24</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="3.html#line-27">27</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="3.html#line-28">28</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="3.html#line-29">29</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="3.html#line-30">30</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="unusedFunction sev_style issue"><td><a href="3.html#line-33">33</a></td><td>unusedFunction</td><td><a href="https://cwe.mitre.org/data/definitions/561.html">561</a></td><td>style</td><td>The function &apos;address_get_house_number&apos; is never used.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="3.html#line-35">35</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="unusedFunction sev_style issue"><td><a href="3.html#line-40">40</a></td><td>unusedFunction</td><td><a href="https://cwe.mitre.org/data/definitions/561.html">561</a></td><td>style</td><td>The function &apos;address_get_street_number&apos; is never used.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="3.html#line-42">42</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="unusedFunction sev_style issue"><td><a href="3.html#line-47">47</a></td><td>unusedFunction</td><td><a href="https://cwe.mitre.org/data/definitions/561.html">561</a></td><td>style</td><td>The function &apos;address_get_city&apos; is never used.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="3.html#line-49">49</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="unusedFunction sev_style issue"><td><a href="3.html#line-54">54</a></td><td>unusedFunction</td><td><a href="https://cwe.mitre.org/data/definitions/561.html">561</a></td><td>style</td><td>The function &apos;address_get_town_name&apos; is never used.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="3.html#line-56">56</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="5.html">src\admin.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="5.html#line-16">16</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-8-9 sev_style issue"><td><a href="5.html#line-18">18</a></td><td>misra-c2012-8.9</td><td></td><td>style</td><td>An object should be defined at block scope if its identifier only appears in single function</td></tr>
+         <tr class="misra-c2012-8-9 sev_style issue"><td><a href="5.html#line-19">19</a></td><td>misra-c2012-8.9</td><td></td><td>style</td><td>An object should be defined at block scope if its identifier only appears in single function</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="5.html#line-23">23</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="7.html">src\bill_queue.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="7.html#line-8">8</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-12">12</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-21">21</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-31">31</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="7.html#line-34">34</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-36">36</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-59">59</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-63">63</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="7.html#line-81">81</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-88">88</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-92">92</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-105">105</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="7.html#line-111">111</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-121">121</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="7.html#line-129">129</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="9.html">src\cash_queue.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="9.html#line-8">8</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-12">12</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-21">21</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-31">31</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="9.html#line-34">34</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-36">36</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-59">59</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-63">63</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="9.html#line-81">81</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-88">88</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-92">92</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-105">105</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-21-3 sev_style issue"><td><a href="9.html#line-111">111</a></td><td>misra-c2012-21.3</td><td></td><td>style</td><td>The memory allocation and deallocation function of &lt;stdlib.h&gt; shall not be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-121">121</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="9.html#line-129">129</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="10.html">src\main.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="10.html#line-13">13</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-21-6 sev_style issue"><td><a href="10.html#line-13">13</a></td><td>misra-c2012-21.6</td><td></td><td>style</td><td>The standard input/output functions shall not be used.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-72">72</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-84">84</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-96">96</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-109">109</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-127">127</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="constParameterPointer sev_style issue"><td><a href="10.html#line-137">137</a></td><td>constParameterPointer</td><td><a href="https://cwe.mitre.org/data/definitions/398.html">398</a></td><td>style</td><td>Parameter &apos;acc&apos; can be declared as pointer to const</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-152">152</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-169">169</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-11-8 sev_style issue"><td><a href="10.html#line-184">184</a></td><td>misra-c2012-11.8</td><td></td><td>style</td><td>A cast shall not remove any cost or volatile qualification for the type pointed to by a pointer</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-187">187</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-11-8 sev_style issue"><td><a href="10.html#line-197">197</a></td><td>misra-c2012-11.8</td><td></td><td>style</td><td>A cast shall not remove any cost or volatile qualification for the type pointed to by a pointer</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-221">221</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-237">237</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-255">255</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-272">272</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-300">300</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-317">317</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-332">332</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-338">338</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-447">447</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-452">452</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-641">641</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="10.html#line-646">646</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="12.html">src\platform.c</a></td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="12.html#line-14">14</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-21-6 sev_style issue"><td><a href="12.html#line-14">14</a></td><td>misra-c2012-21.6</td><td></td><td>style</td><td>The standard input/output functions shall not be used.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="12.html#line-15">15</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="12.html#line-16">16</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;time.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-21-10 sev_style issue"><td><a href="12.html#line-16">16</a></td><td>misra-c2012-21.10</td><td></td><td>style</td><td>The standard library time and date function shall not be used</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="12.html#line-19">19</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;conio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="12.html#line-21">21</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;termios.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="12.html#line-22">22</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;unistd.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-21-21 sev_style issue"><td><a href="12.html#line-27">27</a></td><td>misra-c2012-21.21</td><td></td><td>style</td><td>misra violation 2121 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-21-21 sev_style issue"><td><a href="12.html#line-29">29</a></td><td>misra-c2012-21.21</td><td></td><td>style</td><td>misra violation 2121 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="12.html#line-43">43</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="constVariablePointer sev_style issue"><td><a href="12.html#line-57">57</a></td><td>constVariablePointer</td><td><a href="https://cwe.mitre.org/data/definitions/398.html">398</a></td><td>style</td><td>Variable &apos;local_time&apos; can be declared as pointer to const</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="12.html#line-60">60</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="12.html#line-72">72</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      <tbody class="fileEntry">
+       <tr><td colspan="5"><a href="13.html">src\ui_screens.c</a></td></tr>
+         <tr class="normalCheckLevelMaxBranches sev_information issue"><td><a href="13.html#line-0">0</a></td><td>normalCheckLevelMaxBranches</td><td></td><td>information</td><td>Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="13.html#line-13">13</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-21-6 sev_style issue"><td><a href="13.html#line-13">13</a></td><td>misra-c2012-21.6</td><td></td><td>style</td><td>The standard input/output functions shall not be used.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="13.html#line-14">14</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="missingIncludeSystem sev_information issue"><td><a href="13.html#line-15">15</a></td><td>missingIncludeSystem</td><td></td><td>information</td><td>Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-23">23</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-26">26</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-27">27</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-31">31</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-34">34</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-37">37</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-40">40</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-43">43</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-54">54</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-55">55</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-56">56</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-62">62</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-63">63</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-64">64</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-69">69</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-70">70</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-71">71</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-72">72</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-73">73</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-74">74</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-75">75</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-76">76</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-81">81</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-82">82</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-83">83</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-84">84</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-85">85</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-86">86</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-87">87</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-88">88</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-89">89</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-94">94</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-95">95</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-96">96</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-97">97</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-98">98</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-99">99</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-104">104</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-105">105</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-106">106</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-107">107</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-108">108</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-109">109</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-110">110</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-111">111</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-116">116</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-117">117</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-118">118</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-119">119</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-120">120</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-121">121</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-126">126</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-127">127</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-128">128</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-129">129</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-130">130</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-131">131</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-132">132</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-133">133</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-138">138</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-139">139</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-140">140</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-141">141</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-142">142</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-143">143</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-144">144</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-145">145</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-146">146</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-151">151</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-152">152</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-153">153</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-154">154</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-155">155</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-156">156</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-157">157</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-158">158</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-163">163</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-164">164</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-165">165</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-166">166</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-167">167</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-168">168</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-169">169</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-170">170</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-176">176</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-183">183</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-184">184</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-195">195</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-198">198</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-201">201</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-204">204</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-211">211</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-214">214</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-217">217</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-220">220</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-227">227</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-230">230</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-233">233</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-236">236</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-243">243</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-246">246</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-249">249</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-252">252</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-255">255</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-258">258</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-265">265</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-268">268</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-271">271</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-274">274</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-277">277</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-284">284</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-286">286</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-289">289</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-296">296</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-299">299</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-302">302</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-305">305</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-312">312</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-313">313</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-316">316</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-319">319</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-322">322</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-325">325</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-332">332</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-335">335</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-338">338</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-341">341</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-346">346</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-347">347</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-348">348</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-356">356</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-357">357</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-375">375</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-376">376</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-377">377</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-378">378</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-379">379</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-380">380</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-381">381</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-382">382</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-383">383</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-385">385</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-386">386</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-387">387</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-388">388</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-389">389</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-394">394</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-397">397</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-398">398</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-399">399</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-400">400</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-401">401</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-406">406</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-409">409</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-410">410</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-411">411</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-412">412</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-413">413</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-417">417</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-418">418</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-423">423</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-424">424</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-8-4 sev_style issue"><td><a href="13.html#line-440">440</a></td><td>misra-c2012-8.4</td><td></td><td>style</td><td>A compatible declaration shall be visible when an object or function with external linkage is defined</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-444">444</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-8-4 sev_style issue"><td><a href="13.html#line-461">461</a></td><td>misra-c2012-8.4</td><td></td><td>style</td><td>A compatible declaration shall be visible when an object or function with external linkage is defined</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-466">466</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-22-8 sev_style issue"><td><a href="13.html#line-469">469</a></td><td>misra-c2012-22.8</td><td></td><td>style</td><td>misra violation 2208 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-22-9 sev_style issue"><td><a href="13.html#line-469">469</a></td><td>misra-c2012-22.9</td><td></td><td>style</td><td>misra violation 2209 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-471">471</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-8-4 sev_style issue"><td><a href="13.html#line-478">478</a></td><td>misra-c2012-8.4</td><td></td><td>style</td><td>A compatible declaration shall be visible when an object or function with external linkage is defined</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-482">482</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-8-4 sev_style issue"><td><a href="13.html#line-489">489</a></td><td>misra-c2012-8.4</td><td></td><td>style</td><td>A compatible declaration shall be visible when an object or function with external linkage is defined</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-494">494</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-22-8 sev_style issue"><td><a href="13.html#line-497">497</a></td><td>misra-c2012-22.8</td><td></td><td>style</td><td>misra violation 2208 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-22-9 sev_style issue"><td><a href="13.html#line-497">497</a></td><td>misra-c2012-22.9</td><td></td><td>style</td><td>misra violation 2209 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-499">499</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-8-4 sev_style issue"><td><a href="13.html#line-506">506</a></td><td>misra-c2012-8.4</td><td></td><td>style</td><td>A compatible declaration shall be visible when an object or function with external linkage is defined</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-511">511</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-22-8 sev_style issue"><td><a href="13.html#line-514">514</a></td><td>misra-c2012-22.8</td><td></td><td>style</td><td>misra violation 2208 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-22-9 sev_style issue"><td><a href="13.html#line-514">514</a></td><td>misra-c2012-22.9</td><td></td><td>style</td><td>misra violation 2209 with no text in the supplied rule-texts-file</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-516">516</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-8-4 sev_style issue"><td><a href="13.html#line-527">527</a></td><td>misra-c2012-8.4</td><td></td><td>style</td><td>A compatible declaration shall be visible when an object or function with external linkage is defined</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-531">531</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-534">534</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-545">545</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-547">547</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-557">557</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-561">561</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-573">573</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-576">576</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-578">578</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-581">581</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-584">584</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-586">586</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-589">589</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-593">593</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-595">595</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-598">598</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-612">612</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-615">615</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-617">617</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-620">620</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-627">627</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-630">630</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-632">632</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-635">635</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-639">639</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-641">641</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-644">644</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-659">659</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-664">664</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-666">666</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-669">669</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-672">672</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-674">674</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-677">677</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-680">680</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-682">682</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-685">685</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-688">688</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-690">690</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-693">693</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-697">697</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-699">699</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-703">703</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-706">706</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-708">708</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-711">711</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-715">715</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-717">717</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-720">720</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-723">723</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-725">725</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-728">728</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-732">732</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-734">734</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-737">737</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-741">741</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-743">743</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-746">746</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-752">752</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-754">754</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-757">757</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-765">765</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-767">767</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-770">770</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-774">774</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-776">776</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-779">779</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-782">782</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-784">784</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-787">787</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-798">798</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-801">801</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-803">803</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-806">806</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-809">809</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-811">811</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-814">814</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-826">826</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-829">829</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-831">831</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-834">834</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-837">837</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-839">839</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-842">842</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-856">856</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-859">859</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-861">861</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-864">864</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-867">867</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-869">869</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-872">872</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-885">885</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-888">888</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-890">890</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-893">893</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-905">905</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-17-7 sev_style issue"><td><a href="13.html#line-908">908</a></td><td>misra-c2012-17.7</td><td></td><td>style</td><td>The value returned by a function having non void return type shall be used</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-910">910</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+         <tr class="misra-c2012-15-5 sev_style issue"><td><a href="13.html#line-913">913</a></td><td>misra-c2012-15.5</td><td></td><td>style</td><td>A function should have a single point of exit at the end</td></tr>
+      </tbody>
+       </table>
+    </div>
+    <div id="footer" class="footer">
+      <p>
+        Created by Cppcheck 2.14.2 (<a href="https://cppcheck.sourceforge.io">Sourceforge</a>, <a href="irc://irc.freenode.net/cppcheck">IRC</a>)
+      </p>
+    </div>
+    </div>
+  </body>
+</html>

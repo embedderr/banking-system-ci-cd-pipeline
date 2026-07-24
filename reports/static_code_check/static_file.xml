@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="2.14.2"/>
+    <errors>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\account.h" line="18" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stddef.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stddef.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\common.h" line="18" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\account.c" line="8" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\account.c" line="9" column="0"/>
+        </error>
+        <error id="constParameterPointer" severity="style" msg="Parameter &apos;db&apos; can be declared as pointer to const" verbose="Parameter &apos;db&apos; can be declared as pointer to const" cwe="398" file0="src/account.c">
+            <location file="src\account.c" line="159" column="48" info="Parameter &apos;db&apos; can be declared as pointer to const"/>
+            <symbol>db</symbol>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\address.c" line="8" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\address.c" line="9" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\admin.h" line="12" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\admin.c" line="16" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\bill_queue.h" line="16" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\bill_queue.c" line="8" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\cash_queue.h" line="22" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\cash_queue.c" line="8" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\main.c" line="13" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdbool.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\ui_screens.h" line="22" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stddef.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stddef.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="include\ui_screens.h" line="23" column="0"/>
+        </error>
+        <error id="constParameterPointer" severity="style" msg="Parameter &apos;acc&apos; can be declared as pointer to const" verbose="Parameter &apos;acc&apos; can be declared as pointer to const" cwe="398" file0="src/main.c">
+            <location file="src\main.c" line="137" column="45" info="Parameter &apos;acc&apos; can be declared as pointer to const"/>
+            <symbol>acc</symbol>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\platform.c" line="14" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\platform.c" line="15" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;time.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;time.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\platform.c" line="16" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;termios.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;termios.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\platform.c" line="21" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;unistd.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;unistd.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\platform.c" line="22" column="0"/>
+        </error>
+        <error id="constVariablePointer" severity="style" msg="Variable &apos;local_time&apos; can be declared as pointer to const" verbose="Variable &apos;local_time&apos; can be declared as pointer to const" cwe="398" file0="src/platform.c">
+            <location file="src\platform.c" line="57" column="16" info="Variable &apos;local_time&apos; can be declared as pointer to const"/>
+            <symbol>local_time</symbol>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;conio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;conio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\platform.c" line="19" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdio.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\ui_screens.c" line="13" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;stdlib.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\ui_screens.c" line="14" column="0"/>
+        </error>
+        <error id="missingIncludeSystem" severity="information" msg="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results." verbose="Include file: &lt;string.h&gt; not found. Please note: Cppcheck does not need standard library headers to get proper results.">
+            <location file="src\ui_screens.c" line="15" column="0"/>
+        </error>
+        <error id="normalCheckLevelMaxBranches" severity="information" msg="Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches." verbose="Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches." file0="src/ui_screens.c">
+            <location file="src\ui_screens.c" line="0" column="0"/>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;address_get_house_number&apos; is never used." verbose="The function &apos;address_get_house_number&apos; is never used." cwe="561">
+            <location file="src\address.c" line="33" column="0"/>
+            <symbol>address_get_house_number</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;address_get_street_number&apos; is never used." verbose="The function &apos;address_get_street_number&apos; is never used." cwe="561">
+            <location file="src\address.c" line="40" column="0"/>
+            <symbol>address_get_street_number</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;address_get_city&apos; is never used." verbose="The function &apos;address_get_city&apos; is never used." cwe="561">
+            <location file="src\address.c" line="47" column="0"/>
+            <symbol>address_get_city</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;address_get_town_name&apos; is never used." verbose="The function &apos;address_get_town_name&apos; is never used." cwe="561">
+            <location file="src\address.c" line="54" column="0"/>
+            <symbol>address_get_town_name</symbol>
+        </error>
+        <error id="checkersReport" severity="information" msg="Active checkers: 109/802 (use --checkers-report=&lt;filename&gt; to see details)" verbose="Active checkers: 109/802 (use --checkers-report=&lt;filename&gt; to see details)"/>
+    </errors>
+</results>
