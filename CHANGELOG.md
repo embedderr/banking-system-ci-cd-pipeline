@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [v9.0.0] - 2026-07-24
+
+- update CHANGELOG.md for v9.0.0-rc1 [skip ci]
+
+- promote v9.0.0-rc1 to production as v9.0.0
 ## [v9.0.0-rc1] - 2026-07-24
 
 - update CHANGELOG.md for v8.0.0 [skip ci]
