@@ -130,14 +130,12 @@ what changed and why (e.g., `docs: add SRS-014 for ATM PIN change flow`).
 
 | Stage | Status |
 |---|---|
-| Business Requirements (BRS) | ⬜ Not started |
-| Software Requirements (SRS) | ⬜ Not started |
-| Architecture + High-Level Design (HLD) | ⬜ Not started |
-| Low-Level Design (LLD) | ⬜ Not started |
-| Coding | ⬜ Not started |
-| Unit Testing | ⬜ Not started |
-| Functional / System Testing | ⬜ Not started |
-| User Acceptance Testing (UAT) | ⬜ Not started |
-| Requirement Traceability Matrix (RTM) | ⬜ Not started |
-```
-
+| Business Requirements (BRS) | ✅ Complete (7 items, `requirements/BRS_SRS.xlsx`) |
+| Software Requirements (SRS) | ✅ Complete (32 items, `requirements/BRS_SRS.xlsx`) |
+| Architecture + High-Level Design (HLD) | ✅ Complete (`design/HLD.md`) |
+| Low-Level Design (LLD) | ✅ Complete (`design/LLD.md`) |
+| Coding | ✅ Complete (8 modules, `src/`, `include/`) |
+| Unit Testing | ✅ Complete — 120/120 passing (`testing/unit_test_cases.xlsx`) |
+| Functional / System Testing | ✅ Complete — 15/15 passing (`testing/functional_test_cases.xlsx`) |
+| User Acceptance Testing (UAT) | 🟡 Awaiting sign-off (`testing/uat_checklist.xlsx`) |
+| Requirement Traceability Matrix (RTM) | ✅ Complete — 32/32 full coverage (`traceability/RTM.xlsx`) |

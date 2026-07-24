@@ -1,6 +1,6 @@
 # Low-Level Design (LLD) — Banking System
 
-**Document Status:** Draft
+**Document Status:** Final (V-Model complete — see `docs/README.md` Current Status)
 **Depends on:** `design/HLD.md`
 **Related Requirements:** All SRS items in `requirements/BRS_SRS.xlsx`
 
@@ -46,10 +46,7 @@ account balance) is written through an output pointer parameter, following
 the standard C convention:
 
 ```c
-StatusCode account_db_get_balance(const AccountDatabase *db,
-                                   const char *username,
-                                   const char *password,
-                                   Money *out_balance);
+StatusCode account_db_get_balance(const AccountNode *acc, Money *out_balance);
 ```
 
 The caller always checks the returned `StatusCode` before trusting any
@@ -63,6 +60,19 @@ output parameter's value.
 - Every module that allocates provides a matching `_destroy()` function
   that frees all its own memory — no module frees memory it did not
   allocate.
+
+### 1.5 Testability: Internal Test-Only Headers
+
+Where a module's internal (`static`) helper functions carry real logic
+worth verifying directly (rather than only through the module's public
+API), that module may expose a **test-only internal header** —
+e.g. `include/ui_screens_internal.h` for `ui_screens`' input-parsing
+helpers (`read_line`, `parse_long`, `parse_int`, `parse_long_long`,
+`parse_double`, `copy_bounded`). These headers are used exclusively by
+files under `tests/`; no production code (including `main.c`) includes
+them. This keeps the module's real public API (`ui_screens.h`) unchanged
+while still allowing focused, direct unit testing of logic that would
+otherwise only be reachable through full end-to-end input simulation.
 
 ---
 
@@ -130,7 +140,12 @@ void platform_get_current_time(SystemTime *out_time);
 - `platform_clear_screen()` — wraps `system("cls")` (Windows) internally;
   a Linux build swaps this single function's body for `system("clear")`.
 - `platform_wait_for_keypress()` — wraps `_getch()` (Windows) internally;
-  a Linux build swaps this for a `termios`-based equivalent.
+  a Linux build swaps this for a `termios`-based equivalent. **Testing
+  note:** on Windows, `_getch()` reads directly from the console and does
+  not respect redirected/piped stdin, so this function is deliberately
+  **not** called by an automated unit test (see `tests/test_platform.c`
+  and `traceability/RTM.xlsx`, SRS-025, for the full explanation) — it is
+  instead verified functionally via the 15 functional test scenarios.
 - `platform_get_current_time()` — wraps `time()`/`localtime()`, filling
   the portable `SystemTime` struct so no other module touches `<time.h>`
   directly.
@@ -208,13 +223,6 @@ StatusCode bill_queue_enqueue(BillQueue *q, const BillRequestInput *input);
 StatusCode bill_queue_dequeue(BillQueue *q, BillRequestInput *out_processed);
 StatusCode bill_queue_peek_front(const BillQueue *q, BillRequestInput *out_front);
 void       bill_queue_destroy(BillQueue *q);
-```
-
-`bill_queue_display_all()` is intentionally **not** in this module — instead,
-`bill_queue` exposes an iterator-friendly accessor so `ui_screens` can walk
-the queue and print it without `bill_queue` itself doing any I/O:
-
-```c
 const BillNode *bill_queue_get_front_node(const BillQueue *q);
 const BillNode *bill_queue_get_next_node(const BillNode *node);
 ```
@@ -262,16 +270,17 @@ StatusCode cash_queue_enqueue(CashQueue *q, const CashRequestInput *input);
 StatusCode cash_queue_dequeue(CashQueue *q, CashRequestInput *out_processed);
 StatusCode cash_queue_peek_front(const CashQueue *q, CashRequestInput *out_front);
 void       cash_queue_destroy(CashQueue *q);
-
 const CashNode *cash_queue_get_front_node(const CashQueue *q);
 const CashNode *cash_queue_get_next_node(const CashNode *node);
 ```
 
 Note: applying a dequeued request's amount to the target account's balance
 (SRS-030) is performed by `main`, which calls `cash_queue_dequeue()` to
-retrieve the request, then calls the appropriate `account` module function
-(`account_db_apply_deposit()` / `account_db_apply_withdrawal()`) — `cash_queue`
-itself has no dependency on `account` (see HLD dependency graph).
+retrieve the request, then calls `account_db_find_by_account_number()`
+followed by `account_db_apply_deposit()` / `account_db_apply_withdrawal()`
+— `cash_queue` itself has no dependency on `account` (see HLD dependency
+graph). This is wired to a dedicated **"Process Cash Transactions"** entry
+on the top-level admin menu.
 
 **Satisfies:** SRS-015, SRS-016, SRS-017, SRS-029, SRS-030.
 
@@ -332,7 +341,7 @@ const AccountNode *account_db_get_first_pending(const AccountDatabase *db);
 const AccountNode *account_db_get_next_pending(const AccountNode *current);
 
 StatusCode account_db_approve(AccountDatabase *db, AccountNode *node);
-StatusCode account_db_decline(AccountDatabase *db, AccountNode *node);
+StatusCode account_db_decline(AccountNode *node);
 StatusCode account_db_delete(AccountDatabase *db, long account_number);
 
 AccountNode *account_db_find_by_credentials(AccountDatabase *db,
@@ -342,6 +351,13 @@ AccountNode *account_db_find_by_credentials(AccountDatabase *db,
 bool       account_db_check_atm_credentials(const AccountDatabase *db,
                                              long account_number,
                                              int pin);
+
+AccountNode *account_db_find_by_atm_credentials(AccountDatabase *db,
+                                                 long account_number,
+                                                 int pin);
+
+AccountNode *account_db_find_by_account_number(AccountDatabase *db,
+                                                long account_number);
 
 StatusCode account_db_apply_withdrawal(AccountNode *acc, Money amount);
 StatusCode account_db_apply_deposit(AccountNode *acc, Money amount);
@@ -354,6 +370,20 @@ const AccountNode *account_db_get_all_next(const AccountNode *current);
 long account_db_generate_account_number(const AccountDatabase *db);
 ```
 
+**Additions made during coding, beyond the original LLD draft:**
+- **`account_db_find_by_atm_credentials()`** — looks up an account by
+  account number + PIN. Called once at ATM login; the returned pointer is
+  reused for the rest of that ATM session, so the user is never re-asked
+  for username/password on every subsequent ATM action — a fix over an
+  inconsistency in the original prototype, which re-authenticated via
+  username/password on every single ATM operation despite already having
+  verified account number and PIN at entry.
+- **`account_db_find_by_account_number()`** — looks up a completed account
+  by number alone, with no credential check. Used by admin cash-queue
+  processing (SRS-030), where the caller is an already-authenticated admin
+  acting on an account specified only by number (no PIN available in that
+  context).
+
 ### 7.3 Notes on Fixed Bugs from the Original
 
 - **Balance now initialized to `0.00`** at `account_db_approve()` time
@@ -361,6 +391,14 @@ long account_db_generate_account_number(const AccountDatabase *db);
 - **`account_db_delete()` correctly updates `tail`** when the last node is
   removed, and safely returns `STATUS_ERROR_NOT_FOUND` instead of
   dereferencing a `NULL` pointer when the account isn't found mid-list.
+- **`account_db_decline()` genuinely updates status.** The original
+  prototype used `==` instead of `=` in this spot, so the comparison had
+  no effect and the status was never actually changed.
+- **Account number generation fixed off-by-one.** The original called
+  `generateAccountNumber()` *after* setting status to `Completed`, so the
+  very first approved account counted itself and received `base + 1`
+  instead of `base`. `account_db_approve()` now computes the number
+  *before* the status change.
 - **PIN change validates the new PIN is exactly 4 digits** (0–9999 range
   check plus digit-count validation), addressing SRS-023 and SRS-014.
 
@@ -380,7 +418,10 @@ bool admin_check_credentials(const char *username, const char *password);
 
 Credentials are compared against fixed constants defined internally in
 `admin.c` (not exposed via the header), matching the original design
-intent of a single hardcoded administrator account.
+intent of a single hardcoded administrator account. This is a documented,
+known limitation (see `admin.c` header comment) — a production system
+would instead store a hashed credential loaded from a protected
+configuration source, not compile it into the binary in plaintext.
 
 **Satisfies:** SRS-009.
 
@@ -388,40 +429,87 @@ intent of a single hardcoded administrator account.
 
 ## 9. `ui_screens` Module
 
-**Files:** `include/ui_screens.h`, `src/ui_screens.c`
+**Files:** `include/ui_screens.h`, `include/ui_screens_internal.h`
+(test-only, see Section 1.5), `src/ui_screens.c`
 
-This module owns **all** `scanf`/`printf` calls in the system. It has two
-categories of functions:
+This module owns **all** `scanf`/`printf` calls in the system.
 
 ### 9.1 Display Functions (no return value, pure output)
 
 ```c
 void ui_show_start_screen(const SystemTime *time);
 void ui_show_end_screen(const SystemTime *time);
-void ui_show_bank_menu(const SystemTime *time);
-void ui_show_atm_menu(const SystemTime *time);
-void ui_show_admin_menu(const SystemTime *time);
-/* ... one per screen identified in the original bankEnterScreen(),
-   screenBank(), screenATMone/two(), screenAdminOne/Two(), etc. */
+void ui_show_main_menu_header(const SystemTime *time);
+void ui_show_bank_menu_header(const SystemTime *time);
+void ui_show_atm_login_header(const SystemTime *time);
+void ui_show_atm_menu_header(const SystemTime *time);
+void ui_show_admin_login_header(const SystemTime *time);
+void ui_show_admin_menu_header(const SystemTime *time);
+void ui_show_admin_account_openings_header(const SystemTime *time);
+void ui_show_admin_bill_payments_header(const SystemTime *time);
+void ui_show_admin_cash_queue_header(const SystemTime *time);
+void ui_show_invalid_option_message(const SystemTime *time);
+void ui_show_invalid_credentials_message(const SystemTime *time);
 ```
 
-### 9.2 Collection Functions (fill an Input struct, return success/failure)
+### 9.2 Result / Feedback Display Functions
+
+Added during coding to report the outcome of each business-logic call back
+to the user, in line with the I/O Separation Principle (Section 1.2):
+
+```c
+void ui_show_bill_enqueue_result(StatusCode result);
+void ui_show_bill_process_result(StatusCode result);
+void ui_show_cash_enqueue_result(StatusCode result);
+void ui_show_cash_process_result(StatusCode result);
+void ui_show_account_request_result(StatusCode result);
+void ui_show_account_decision_result(StatusCode result, bool approved);
+void ui_show_account_delete_result(StatusCode result);
+void ui_show_withdrawal_result(StatusCode result, Money remaining_balance);
+void ui_show_pin_change_result(StatusCode result);
+void ui_show_balance(long account_number, Money balance);
+void ui_show_account_details(const AccountNode *acc);
+void ui_show_bill_request(const BillRequestInput *req, int index);
+void ui_show_cash_request(const CashRequestInput *req, int index);
+void ui_show_queue_empty_message(const char *queue_label);
+void ui_show_database_empty_message(void);
+```
+
+### 9.3 Collection Functions (fill an Input struct, return success/failure)
 
 ```c
 bool ui_collect_menu_choice(int *out_choice);
+bool ui_confirm_yes_no(const char *prompt_message);
 bool ui_collect_bill_request(BillRequestInput *out_input);
 bool ui_collect_cash_request(CashRequestInput *out_input);
 bool ui_collect_new_account_request(NewAccountInput *out_input);
 bool ui_collect_login_credentials(char *out_username, size_t username_cap,
                                    char *out_password, size_t password_cap);
 bool ui_collect_atm_login(long *out_account_number, int *out_pin);
-bool ui_confirm_yes_no(const char *prompt_message);
+bool ui_collect_pin_change(int *out_old_pin, int *out_new_pin);
+bool ui_collect_withdrawal_amount(Money *out_amount);
+bool ui_collect_account_number(long *out_account_number);
 ```
 
 Every `ui_collect_*` function returns `false` if the user's raw input fails
 basic validation (e.g., non-numeric where a number was expected) — this is
 where SRS-027 (reject invalid numeric input rather than proceeding with an
-indeterminate value) is enforced.
+indeterminate value) is enforced, via the internal `read_line()` /
+`parse_long()` / `parse_int()` / `parse_long_long()` / `parse_double()` /
+`copy_bounded()` helpers exposed for direct testing via
+`ui_screens_internal.h` (Section 1.5).
+
+### 9.4 EOF / Closed-Input Safety
+
+```c
+bool ui_is_input_exhausted(void);
+```
+
+Added during coding after discovering that running the compiled program
+with no piped input (e.g. a CI runner with closed stdin) would otherwise
+loop forever re-prompting on every failed read. `main.c` checks this after
+any failed `ui_collect_menu_choice()` call and exits gracefully rather than
+looping, at every menu level in the program.
 
 **Satisfies:** No direct SRS (presentation-layer support for all functional
 SRS); enforces SRS-027 at the point of input collection.
@@ -437,7 +525,9 @@ SRS); enforces SRS-027 at the point of input collection.
 Replaces every `goto`-based menu loop from the original with structured
 `do { ... } while (...)` loops. Owns the top-level orchestration: calls a
 `ui_collect_*` function, passes the result to the relevant module's logic
-function, then calls a `ui_show_*`/display function with the outcome.
+function, then calls a `ui_show_*`/display function with the outcome. Every
+menu loop also checks `ui_is_input_exhausted()` on a failed read and exits
+cleanly rather than looping (Section 9.4).
 
 ### 10.2 Example Flow (Bill Payment Submission)
 
@@ -465,20 +555,22 @@ sequences calls between `ui_screens` and the business-logic modules.
 | `address` | `Address` | `address_display`, `address_get_*` | supports SRS-001 |
 | `bill_queue` | `BillRequestInput`, `BillNode`, `BillQueue` | `bill_queue_enqueue/dequeue/peek_front` | SRS-018–022 |
 | `cash_queue` | `CashRequestInput`, `CashNode`, `CashQueue` | `cash_queue_enqueue/dequeue/peek_front` | SRS-015–017, SRS-029, SRS-030 |
-| `account` | `NewAccountInput`, `AccountNode`, `AccountDatabase` | `account_db_insert_pending/approve/decline/delete`, `account_db_apply_withdrawal/deposit`, `account_db_change_pin` | SRS-001–014, SRS-031, SRS-032 |
+| `account` | `NewAccountInput`, `AccountNode`, `AccountDatabase` | `account_db_insert_pending/approve/decline/delete`, `account_db_apply_withdrawal/deposit`, `account_db_change_pin`, `account_db_find_by_atm_credentials`, `account_db_find_by_account_number` | SRS-001–014, SRS-031, SRS-032 |
 | `admin` | — | `admin_check_credentials` | SRS-009 |
-| `ui_screens` | (Input structs from other modules) | `ui_collect_*`, `ui_show_*` | enforces SRS-027 |
+| `ui_screens` | (Input structs from other modules) | `ui_collect_*`, `ui_show_*`, `ui_is_input_exhausted` | enforces SRS-027 |
 | `main` | — | orchestration only | — |
 
 ---
 
-## 12. Open Items for Coding Phase
+## 12. Status
 
-- Exact numeric bounds for `debit_card_pin` validation (4-digit range:
-  `0`–`9999` inclusive, per SRS-023).
-- Confirm whether `account_db_generate_account_number()` should account for
-  declined/deleted accounts when computing the next sequential number
-  (currently: counts only `ACCOUNT_STATUS_COMPLETED` accounts, matching
-  original behavior).
-- Finalize exact wording of all `ui_show_*` menu text (cosmetic, does not
-  block coding start).
+All items originally listed under "Open Items for Coding Phase" have been
+resolved:
+- `debit_card_pin` validated to the 4-digit range `0`–`9999` inclusive.
+- `account_db_generate_account_number()` counts only
+  `ACCOUNT_STATUS_COMPLETED` accounts, matching original behavior.
+- All `ui_show_*` menu text finalized in `src/ui_screens.c`.
+
+See `traceability/RTM.xlsx` for confirmation that every SRS requirement
+tied to this design has corresponding, verified unit test and/or
+functional test evidence (32/32 full coverage).

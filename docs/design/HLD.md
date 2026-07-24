@@ -1,6 +1,6 @@
 # High-Level Design (HLD) — Banking System
 
-**Document Status:** Draft
+**Document Status:** Final (V-Model complete — see `docs/README.md` Current Status)
 **Related Requirements:** All SRS items in `requirements/BRS_SRS.xlsx`
 **Traceability:** See `traceability/RTM.xlsx` for the full SRS → Module mapping
 
@@ -62,7 +62,7 @@ implementation to support a new OS; everything above it is untouched.
 | Decision | Rationale |
 |---|---|
 | **Fixed-size `char[]` buffers instead of dynamic strings** | C has no built-in dynamic string type; using fixed, clearly-named buffers (e.g., `MAX_NAME_LEN`) avoids manual heap-string management and keeps memory ownership simple and auditable — standard practice for MISRA-oriented C. |
-| **Struct + free-function modules instead of C++-style classes** | C has no classes. Each module uses the common C idiom of a struct representing the "object" and free functions that take a pointer to that struct as their first parameter (the "opaque handle" pattern), e.g. `account_db_insert(AccountDatabase *db, ...)`. |
+| **Struct + free-function modules instead of C++-style classes** | C has no classes. Each module uses the common C idiom of a struct representing the "object" and free functions that take a pointer to that struct as their first parameter (the "opaque handle" pattern), e.g. `account_db_insert_pending(AccountDatabase *db, ...)`. |
 | **`malloc`/`free` with mandatory NULL-checks** | Replaces C++'s `new`/`delete`. Every allocation is checked before use — a hard requirement for MISRA compliance and for professional C generally. |
 | **No dynamic memory where avoidable** | Where a fixed maximum is reasonable (e.g., address fields), fixed-size struct members are preferred over heap allocation, reducing failure surface. |
 | **All OS-specific calls isolated to `platform.c`** | Directly satisfies SRS-025 (portability, no OS-specific API in core logic). |
@@ -114,7 +114,7 @@ depends only on modules below it.
 **Responsibility:** Isolate every OS-specific call behind a portable
 interface.
 
-| Function (planned) | Purpose |
+| Function | Purpose |
 |---|---|
 | `platform_clear_screen(void)` | Clears the terminal/console. |
 | `platform_wait_for_keypress(void)` | Pauses until the user presses a key. |
@@ -147,9 +147,13 @@ internet). Enqueue, dequeue, view full queue, view front.
 ### 2.5 `cash_queue` — Withdraw/Deposit Queue
 
 **Responsibility:** FIFO queue of cash withdrawal/deposit requests.
-Enqueue, dequeue (now applies the amount to the target account's balance,
-closing the gap identified during requirements review), view full queue,
-view front.
+Enqueue, dequeue (applies the amount to the target account's balance,
+closing a gap identified during requirements review), view full queue,
+view front. Reachable in the running system via a dedicated **"Process
+Cash Transactions"** entry on the top-level admin menu, added alongside
+"Process Account Openings" and "Process Bill Payments" during coding so
+this queue's processing is a fully first-class admin capability, not
+nested inside another menu.
 
 **Satisfies:** SRS-015, SRS-016, SRS-017, SRS-029, SRS-030.
 
@@ -158,7 +162,14 @@ view front.
 **Responsibility:** The core account lifecycle — insert new (pending)
 account request, list pending requests, approve/decline, generate account
 number, delete account, look up account by credentials, balance operations
-(withdraw, PIN change, balance enquiry), display account(s).
+(withdraw, PIN change, balance enquiry), display account(s). Also provides
+two additional lookup functions added during coding to support the ATM
+flow cleanly: one that looks up an account by account number + PIN (used
+once at ATM login, then reused for the rest of that session, rather than
+re-asking for username/password on every ATM action — a fix over the
+original prototype's behavior), and one that looks up by account number
+alone (used by admin cash-queue processing, which has authority to act on
+any account without needing its PIN).
 
 **Satisfies:** SRS-001 through SRS-014 (account + ATM operations act on
 this module's data), SRS-031, SRS-032.
@@ -173,9 +184,12 @@ access to any admin function.
 ### 2.8 `ui_screens` — Menu Display
 
 **Responsibility:** All screen-drawing functions (start screen, end screen,
-bank menu, ATM menu, admin menu, sub-menus). Contains no business logic —
-only display and raw input capture, handed back to `main` for validation
-and dispatch.
+bank menu, ATM menu, admin menu, sub-menus) and all raw input collection.
+Contains no business logic — only display and input capture, handed back
+to `main` for validation and dispatch. See `design/LLD.md` Section 9 for
+the full function list, including the result/feedback display functions
+and the internal input-parsing helpers exposed for testing via
+`include/ui_screens_internal.h`.
 
 **Satisfies:** No direct SRS (presentation-layer support for all
 functional SRS).
@@ -194,7 +208,8 @@ from the original with structured `do { } while()` loops.
 
 The account lifecycle is the most cross-cutting flow in the system —
 touching `ui_screens`, `account`, and `admin`. Shown here as a sequence
-diagram:
+diagram, using the actual LLD/code function names (see `design/LLD.md`
+Section 7.2 for full signatures):
 
 ```mermaid
 sequenceDiagram
@@ -205,10 +220,10 @@ sequenceDiagram
     participant ADM as admin
 
     Customer->>UI: Selects "Open Account"
-    UI->>ACC: account_db_insert(details)
+    UI->>ACC: account_db_insert_pending(db, input)
     ACC->>ACC: Check username uniqueness
     alt Username already taken
-        ACC-->>UI: Reject, prompt for new username
+        ACC-->>UI: STATUS_ERROR_DUPLICATE
     else Username available
         ACC->>ACC: Store as status = PENDING, balance = 0.00
         ACC-->>Customer: "Account request submitted"
@@ -218,11 +233,11 @@ sequenceDiagram
     UI->>ADM: admin_check_credentials(user, pass)
     ADM-->>UI: Authenticated
 
-    UI->>ACC: account_db_list_pending()
-    ACC-->>Admin: Displays pending requests
+    UI->>ACC: account_db_get_first_pending(db) / account_db_get_next_pending(node)
+    ACC-->>Admin: Displays each pending request
 
-    Admin->>ACC: account_db_approve(account_id)
-    ACC->>ACC: Generate account number
+    Admin->>ACC: account_db_approve(db, node)
+    ACC->>ACC: account_db_generate_account_number(db)
     ACC->>ACC: Set status = COMPLETED
     ACC-->>Admin: "Account approved, number assigned"
 ```
@@ -240,19 +255,22 @@ sequenceDiagram
 | `cash_queue` | SRS-015, SRS-016, SRS-017, SRS-029, SRS-030 |
 | `account` | SRS-001 – SRS-014, SRS-031, SRS-032 |
 | `admin` | SRS-009 |
-| `ui_screens` | (presentation layer — no direct SRS) |
+| `ui_screens` | (presentation layer — no direct SRS; enforces SRS-027) |
 | `main` | (orchestration layer — no direct SRS) |
 
 Cross-cutting NFRs (SRS-023, SRS-024, SRS-027, SRS-028) apply across all
-modules rather than any single one, and will be verified at the LLD and
-unit-test stages per module.
+modules rather than any single one. All are now verified — see
+`traceability/RTM.xlsx` for the final, closed-gap coverage (32/32 SRS
+fully covered by unit test, functional test, or CI static analysis
+evidence).
 
 ---
 
-## 5. Open Items for LLD
+## 5. Status Note
 
-The following will be defined at the LLD stage, not here:
-- Exact struct field definitions and data types for every module
-- Exact function signatures (parameters, return types, error codes)
-- Buffer size constants (`MAX_NAME_LEN`, etc.) and their justification
-- Error handling strategy (return codes vs. output parameters)
+This document originally listed "Open Items for LLD" as a placeholder
+section. All of those items have since been resolved during coding and
+testing; see `design/LLD.md` for the finalized struct definitions,
+function signatures, and buffer size constants, and `traceability/RTM.xlsx`
+for confirmation that every requirement here has corresponding, verified
+test evidence.
