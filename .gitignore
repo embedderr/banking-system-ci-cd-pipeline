@@ -1,5 +1,5 @@
 # Build artifacts
-*.exe
+#*.exe
 *.o
 *.obj
 *.out
@@ -7,15 +7,15 @@
 # Coverage
 *.gcda
 *.gcno
-coverage.*
-reports/*
+#coverage.*
+#reports/*
 
 # CMake
 build/
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
-Testing/
+#Testing/
 Makefile
 cmake_install.cmake
 
