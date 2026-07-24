@@ -97,7 +97,6 @@ A complete demonstration of modern CI/CD practices for a C-based banking system.
 # Full pipeline
 scripts\run_all.bat
 
-
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
