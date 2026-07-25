@@ -1726,6 +1726,7 @@ git push origin develop
 -
 -
 -
+-
 
 Then synchronize the branches:(sync main with develop)
 
