@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [v9.2.1] - 2026-07-25
+
+- promote v9.2.1-rc1 to production as v9.2.1
+## [v9.2.1-rc1] - 2026-07-25
+
+- updated bank name
+
+- pushing after local build
+## [v9.1.0-rc1] - 2026-07-24
+
+- update CHANGELOG.md for v9.0.0 [skip ci]
+
+- .github/workflows/release.yml in this file commented out #reports/code_coverage/coverage.html which was earlier above CHANGELOG.md under Create Release section, it was commented because I never wanted coverage.html file in the release assets
 ## [v9.0.0] - 2026-07-24
 
 - update CHANGELOG.md for v9.0.0-rc1 [skip ci]
