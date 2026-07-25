@@ -92,7 +92,6 @@ jobs:
           build/test_account_${{ env.VERSION }}.exe
           build/banking_system_${{ env.VERSION }}.bin
           build/test_account_${{ env.VERSION }}.bin
-          reports/code_coverage/coverage.html
           CHANGELOG.md
         tag_name: ${{ github.ref }}
         name: Banking System ${{ env.VERSION }}
@@ -100,6 +99,8 @@ jobs:
         prerelease: ${{ contains(github.ref, 'rc') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    #reports/code_coverage/coverage.html    
 
     - name: Send Notification
       if: always()
