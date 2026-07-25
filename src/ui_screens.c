@@ -32,7 +32,7 @@ static void print_bank_banner(void) {
         "\t\t||===============================================================================||"
         "\n");
     printf(
-        "\t\t                           APNA BANK                                               "
+        "\t\t                          PUBLIC BANK                                              "
         "\n");
     printf(
         "\t\t                                                                                   "
@@ -52,7 +52,7 @@ static void print_bank_banner(void) {
 void ui_show_start_screen(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||========================================||\n");
-    printf("\t\t\t\t\t\t\t||           Welcome to APNA BANK          ||\n");
+    printf("\t\t\t\t\t\t\t||          Welcome to PUBLIC BANK         ||\n");
     printf("\t\t\t\t\t\t\t||========================================||\n\n");
     platform_wait_for_keypress();
 }
@@ -60,14 +60,14 @@ void ui_show_start_screen(const SystemTime *time) {
 void ui_show_end_screen(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||========================================||\n");
-    printf("\t\t\t\t\t\t\t||     Thank You for using APNA BANK       ||\n");
+    printf("\t\t\t\t\t\t\t||    Thank You for using PUBLIC BANK     ||\n");
     printf("\t\t\t\t\t\t\t||========================================||\n\n");
 }
 
 void ui_show_main_menu_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||========================================||\n");
-    printf("\t\t\t\t\t\t\t||                APNA BANK                ||\n");
+    printf("\t\t\t\t\t\t\t||               PUBLIC BANK               ||\n");
     printf("\t\t\t\t\t\t\t||      Choose an option:                  ||\n");
     printf("\t\t\t\t\t\t\t||          1. Enter Bank                  ||\n");
     printf("\t\t\t\t\t\t\t||          2. Enter ATM                   ||\n");
@@ -79,7 +79,7 @@ void ui_show_main_menu_header(const SystemTime *time) {
 void ui_show_bank_menu_header(const SystemTime *time) {
     print_date_time_header(time);
     printf("\t\t\t\t\t\t\t||===================================================||\n");
-    printf("\t\t\t\t\t\t\t||             Welcome to APNA BANK                  ||\n");
+    printf("\t\t\t\t\t\t\t||            Welcome to PUBLIC BANK                 ||\n");
     printf("\t\t\t\t\t\t\t||      Choose an option:                            ||\n");
     printf("\t\t\t\t\t\t\t||             1. Pay Bills                          ||\n");
     printf("\t\t\t\t\t\t\t||             2. Deposits/Withdrawals               ||\n");
