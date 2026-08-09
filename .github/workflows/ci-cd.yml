@@ -61,6 +61,16 @@ jobs:
           dir "C:\Program Files\Cppcheck\addons\misra.py"
         shell: cmd
 
+
+      # ========== ADD THIS STEP ==========
+      - name: Install Python dependencies for HTML reports
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pygments
+        shell: cmd
+      # ===================================
+        
+
       - name: Prepare Directories
         run: mkdir -Force reports\static_code_check, reports\misra_check
         shell: powershell
