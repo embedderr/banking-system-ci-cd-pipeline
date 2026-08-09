@@ -1,1858 +1,447 @@
 # Banking System CI/CD Pipeline
 
-A complete CI/CD demonstration for a C-based banking system with quality checks, code coverage, and automation.
+A complete, professional demonstration of modern CI/CD and V-Model SDLC practices, built around a real C++-to-C conversion of a banking system application. This project began as a CI/CD learning exercise and grew into a full reference implementation covering requirements engineering, design, modular C development, automated testing, static analysis, and release automation.
 
-## Features
-
-- Code Formatting with `clang-format`
-- Static Analysis (`cppcheck` + `clang-tidy`)
-- MISRA C Compliance Checking
-- Unit Testing(`Gtest`)
-- Code Coverage (`gcov` + `gcovr`)
-- Automated Build
-- GitHub Actions Pipeline
-- Professional HTML Reports
-
-## Project Structure
-
-- `src/` → Source code
-- `include/` → Header files
-- `tests/` → Unit tests
-- `scripts/` → Automation scripts
-- `reports/` → Generated reports
-
-## How to Run Locally
-
-```powershell
-# Run full pipeline
-scripts\run_all.bat
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////
-
-Write-Host "=== System Environment Check ===" -ForegroundColor Green
-
-Write-Host "`n1. GCC:" -ForegroundColor Cyan
-gcc --version
-
-Write-Host "`n2. G++:" -ForegroundColor Cyan
-g++ --version
-
-Write-Host "`n3. Gcovr:" -ForegroundColor Cyan
-gcovr --version
-
-Write-Host "`n4. Cppcheck:" -ForegroundColor Cyan
-cppcheck --version
-
-Write-Host "`n5. CMake:" -ForegroundColor Cyan
-cmake --version
-
-Write-Host "`n6. Python:" -ForegroundColor Cyan
-python --version
-
-Write-Host "`n7. Pip:" -ForegroundColor Cyan
-pip --version
-
-Write-Host "`n8. Clang-format:" -ForegroundColor Cyan
-clang-format --version
-
-Write-Host "`n9. Clang-tidy:" -ForegroundColor Cyan
-clang-tidy --version
-
-Write-Host "`n=== Check Completed ===" -ForegroundColor Green
-
-////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-# Banking System CI/CD Pipeline
-
-A complete demonstration of modern CI/CD practices for a C-based banking system.
-
-## Features
-
-- **Code Formatting** with clang-format
-- **Static Analysis** using cppcheck
-- **MISRA C Compliance** checking
-- **Unit Testing** with Unity Framework
-- **Code Coverage** using gcov + gcovr
-- **Automated Build** with CMake + GCC
-- **GitHub Actions** CI/CD workflow
-
-## Project Structure
-
-- `src/` - Source code
-- `include/` - Header files
-- `tests/` - Unit tests
-- `unity/` - Unity test framework
-- `static_code_analysis/` - Static analysis configuration
-- `reports/` - Generated reports
-- `scripts/` - Automation scripts
-
-## How to Run Locally
-
-```powershell
-# Full pipeline
-scripts\run_all.bat
-
-////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-08-07-2026 - updated README.md
-# Banking System CI/CD Pipeline
-
-A complete demonstration of modern **CI/CD practices** for a C-based banking system.
-
-## Project Overview
-
-This repository demonstrates a full CI/CD pipeline for a simple banking system written in C. It includes quality checks, automated testing, code coverage, and professional reporting.
-
-### Key Features
-
-- **Code Formatting** with `clang-format`
-- **Static Code Analysis** using `cppcheck`
-- **MISRA C Compliance** checking
-- **Unit Testing** with **Unity Framework**
-- **Code Coverage** using `gcov` + `gcovr`
-- **Automated Build** with CMake + GCC
-- **GitHub Actions** for continuous integration
-- Release artifacts for QA/testing
-
-## Why CI/CD?
-
-- Ensures high code quality
-- Catches bugs early
-- Automates repetitive tasks
-- Provides confidence before deployment
-- Makes the project portable and maintainable
-
-## Project Structure
-
-banking-system-ci-cd-pipeline/
-├── src/                    # Main source code
-├── include/                # Header files
-├── tests/                  # Unit tests
-├── unity/                  # Unity test framework
-├── static_code_analysis/   # Static analysis tools & config
-├── scripts/                # Automation scripts
-├── reports/                # Generated reports (gitignored)
-├── release/                # QA executables (gitignored)
-├── .github/workflows/      # GitHub Actions CI/CD
-├── CMakeLists.txt
-├── README.md
-└── .gitignore
-
-
-
-
-
-
-## How to Run Locally
-
-```powershell
-# Full Pipeline (recommended)
-scripts\run_all.bat
-
-# Static Analysis only
-scripts\static_code_analysis.bat
-
-
-
-CI/CD Flow
-
-Code Formatting Check
-Static Analysis + MISRA
-Build
-Unit Testing
-Code Coverage
-Artifact Generation (reports + executables)
-
-
-//////////////////////////////////////////////////////////////////////////////////
-
-
-10-07-2026
-
-**Here is the complete, professional, tutorial-style `README.md` for your project:**
-
-```markdown
-# Banking System CI/CD Pipeline
-
-A complete demonstration of modern **CI/CD practices** for a C-based banking system.
-
-This project is built as a **practice and portfolio project** to showcase industry-standard CI/CD practices for C applications.
-
-## Project Overview
-
-This repository demonstrates a full CI/CD pipeline for a simple banking system written in C. It includes quality checks, automated testing, code coverage, static analysis, and professional reporting.
-
-### Key Features
-
-- **Code Formatting** with `clang-format`
-- **Static Code Analysis** using `cppcheck`
-- **MISRA C Compliance** checking
-- **Unit Testing** with **Unity Framework**
-- **Code Coverage** using `gcov` + `gcovr`
-- **Automated Build** with CMake + GCC
-- **GitHub Actions** for continuous integration
-- **Automated Releases** with artifacts (`.exe`, `.bin`, reports)
-- **Conventional Commits** + Automated Changelog
-
-## Why This Project?
-
-- To learn and demonstrate modern CI/CD practices
-- To show how to build a production-ready pipeline for C projects
-- To serve as a reference for future embedded/C projects
-
-## Project Structure
-
-```
-banking-system-ci-cd-pipeline/
-├── src/                    # Main source code (account, main, etc.)
-├── include/                # Header files
-├── tests/                  # Unit tests
-├── unity/                  # Unity test framework
-├── static_code_analysis/   # Static analysis tools & MISRA config
-├── scripts/                # Automation scripts (run_all.bat, etc.)
-├── reports/                # Generated reports (gitignored)
-├── release/                # QA executables + .bin/.o files (gitignored)
-├── .github/workflows/      # GitHub Actions CI/CD
-├── CMakeLists.txt          # Build configuration
-├── README.md
-├── .gitignore
-├── cliff.toml              # Changelog configuration
-└── .commitlintrc.json      # Commit linting
-```
-
-## How to Run Locally
-
-### Prerequisites
-
-- MSYS2 with MinGW64
-- CMake
-- Python 3
-- LLVM (for clang-format)
-
-### Run Full Pipeline
-
-```powershell
-# Full CI/CD Pipeline
-scripts\run_all.bat
-```
-
-### Run Specific Parts
-
-```powershell
-# Static Analysis + MISRA only
-scripts\static_code_analysis.bat
-```
-
-## CI/CD Flow
-
-1. **Code Formatting** (clang-format)
-2. **Static Analysis + MISRA** (cppcheck)
-3. **Build** (CMake + GCC)
-4. **Unit Testing** (Unity)
-5. **Code Coverage** (gcovr)
-6. **Artifact Generation** (reports + release folder)
-7. **Automated Release** (on tag push)
-
-## GitHub Actions
-
-The pipeline runs automatically on every push and pull request.
-
-**Artifacts** (reports + executables) are available for download after each run.
-
-## Releases
-
-Releases are automated when you push a tag:
-
-```powershell
-git tag v1.0.1
-git push origin v1.0.1
-```
-
-## Conventional Commits
-
-We use Conventional Commits for automatic changelog generation.
-
-**Examples:**
-
-- `feat: add new transaction module`
-- `fix: bug in account balance calculation`
-- `docs: update README`
-
-## How to Contribute
-
-1. Fork the repository
-2. Create a feature branch
-3. Follow Conventional Commits
-4. Submit a Pull Request
+[![Banking System CI/CD](https://github.com/mskumar18/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/mskumar18/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml)
 
 ---
 
-**Replace your current `README.md`** with the above content.
-
-This README is complete, tutorial-style, and professional — perfect for public GitHub profile and future reference.
-
-Let me know if you want to add badges or anything else. 
-
-Now your project is ready for showcasing. 
-
-Would you like to start the STM32 project now?
-
-
-
-///////////////////////////////////////////////////////////////////////////////////
-
-16-07-2026
-
-
-
-feature/* 
-     ↓
-  develop  ← Integration of new features
-     ↓
-   tests   ← Dedicated testing + QA
-     ↓
-  staging  ← Final pre-production validation
-     ↓
-   main    ← Production
-
-
-
-*staging can be renamed to release/* (release/1.0 or release /2.0 etc)
-
-
----------------------------------------------------------------
-Push to develop → Run unit + integration
-Push to tests → Run full automation + HIL
-Push to staging → Run smoke + performance
-
-Keep Tests branch updated regularly from develop.
-Merge Tests → Staging only after tests pass.
----------------------------------------------------------------
-
-Test Type,Primary Branch,When / How It's Run,Environment,Who Runs It
-Unit Tests,Develop (and feature branches),On every commit / PR,Local + CI Pipeline,Developers + CI
-Integration Tests,Develop → Tests,"After merge to Develop, or on Tests branch",CI + Test Environment,Dev + QA
-"Automation Tests (E2E, UI, API)",Tests (mainly),Continuously on Tests branch,Test / QA Environment,QA + Automation team
-HIL Tests (Hardware-in-the-Loop),Tests or Staging,Before promoting to Staging,Specialized Test Bench,QA / Test Engineers
-Regression / Smoke,Staging,Before release to Production,Staging Environment,QA
-Final Acceptance,Staging,"UAT, Performance, Security",Staging (mirrors Prod),QA + Stakeholders
-
-
-Detailed Breakdown by Branch
-1. Feature Branches (temporary)
-
-Unit tests run locally + in CI on every Pull Request.
-Some teams also run basic integration or component tests here.
-Goal: Catch issues early.
-
-2. Develop Branch
-
-Main home for Unit Tests and basic Integration Tests.
-CI pipeline runs full unit + integration test suite on every push/merge.
-Code here is "integration-ready" but not fully QA'd.
-
-3. Tests Branch ← Best place for most testing
-
-This is where heavy testing happens.
-Automation Tests (E2E, Selenium, Cypress, Playwright, API automation, etc.).
-HIL Tests (especially in embedded, automotive, IoT, or hardware-related projects).
-Full regression suites.
-Manual exploratory testing.
-Why? It isolates testing from active development on develop.
-
-4. Staging Branch
-
-Final validation before production.
-Smoke tests, final regression, performance, security scans, UAT (User Acceptance Testing).
-Should be very stable.
-
-5. Main Branch
-
-Only the most critical smoke / sanity tests.
-Production monitoring and post-deploy tests (not development tests).
-
-
-
----------------------------------------------------------------
-
-Complete flow of version control, development, branching, QA releasing, testing, production release etc as below
-
-
-
-Developers
-
-↓
-
-feature/login, feature/new_account, feature/withdraw  ---> after development push and create PR to develop branch
-
-↓
-develop
-
-↓
-
-Feature Freeze (once development is done and ready for QA)
-
-↓
-
-release/2.0 (create this branch from develop branch)
-
-↓
-
-Build #301 (add, commit, push)
-
-↓
-
-QA (click on the CI of this build no, go to artifacts, download the artifacts to test) no tags
-
-↓
-
-25 Bugs
-
-↓
-
-Fix
-
-↓
-
-Build #302 (add, commit, push)
-
-↓
-
-QA (click on the CI of this build no, go to artifacts, download the artifacts to test) no tags
-
-↓
-
-10 Bugs
-
-↓
-
-Fix
-
-↓
-
-Build #303 (add, commit, push)
-
-↓
-
-QA (click on the CI of this build no, go to artifacts, download the artifacts to test) no tags
-
-↓
-
-2 Bugs
-
-↓
-
-Fix
-
-↓
-
-Build #304 (add, commit, push)
-
-↓
-
-QA (click on the CI of this build no, go to artifacts, download the artifacts to test) no tags
-
-↓
-
-Looks Stable
-
-↓
-
-Build #305 (add, commit, push, create tag)
-
-↓
-
-RC1 (Tag v2.0.1-rc1) check releases
-
-↓
-
-QA
-
-↓
-
-1 Bug
-
-↓
-
-Fix
-
-↓
-
-Build #306
-
-↓
-
-RC2(Tag v2.0.1-rc2) check releases
-
-↓
-
-QA
-
-↓
-
-1 Bug
-
-↓
-
-Fix
-
-↓
-
-Build #307
-
-↓
-
-RC3(Tag v2.0.1-rc3) check releases
-
-↓
-
-QA Pass
-
-↓
-
-Merge to main
-
-↓
-
-Tag v2.0.1
-
-↓
-
-Release to Customer -- v2.0.1
-
-
----------------------------------------------------------------
-
-Explanation:
-
-Every time CI compiles the code, it creates a build.
-
-Example:
-
-Build #301
-Build #302
-Build #303
-
-
-These are mostly internal. QA uses them.
-
-The files might be:
-
-banking_system.bin
-banking_system.exe
-test_account.bin
-test_account.exe
-
-These builds are often stored in a CI system (Jenkins, GitLab CI artifacts, GitHub Actions artifacts), not necessarily on GitHub Releases.
-
-
-
-2. Release Candidate (RC)
-
-When a build is considered stable enough, it is labeled:
-
-v2.0.1-RC1
-
-This is still usually the same release/2.0 branch, just a specific build.
-
-create a Git tag:
-
-v2.0.1-RC1
-
-Some also create a GitHub Release called v2.0.0-RC1 and attach:
-
-banking_system.bin
-banking_system.exe
-test_account.bin
-test_account.exe
-
-This allows QA to download exactly the build they should test.
-
-
-Final Release
-
-Suppose RC3 passes all testing.
-
-Now:
-
-release/2.0
-        │
-        ▼
-Merge into main
-
-Create a tag:
-
-v2.0.1
-
-Then create a GitHub Release:
-
-banking_system.bin
-banking_system.exe
-test_account.bin
-test_account.exe
-release_notes.pdf
-source_code(zip)
-
-Release Name:
-v2.0.1
-
-
-Note:
-Build = every compiled output from CI.
-Tag = a permanent marker pointing to a specific commit (e.g., v2.0.1-RC2 or v2.0.1).
-GitHub Release = a user-friendly page, usually associated with a tag, where you publish binaries, installers, firmware images, and release notes for QA or customers.
-
-Development builds → GitHub Actions Artifacts (internal use).
-RC builds → GitHub Releases (QA testing).
-Final release → GitHub Releases (customers, manufacturing, or deployment).
----------------------------------------------------------------
-
-
-Development workflow guide for dev team:
-
-
-
-Customer Requirement
-        │
-        ▼
-GitHub Issue
-        │
-        ▼
-Sprint Planning
-        │
-        ▼
-feature/<issue>-<name>
-        │
-        ▼
-Code + Local Testing
-        │
-        ▼
-Pull Request
-        │
-        ▼
-Code Review
-        │
-        ▼
-Merge → develop
-        │
-        ▼
-CI Build + Tests
-        │
-        ▼
-Artifacts (QA)
-        │
-        ▼
-Feature Complete?
-        │
-        ├── No → Continue development
-        │
-        └── Yes
-               │
-               ▼
-         release/2.0
-               │
-               ▼
-        QA Testing
-               │
-        Bug Fixes on release/2.0
-               │
-               ▼
-        Tag v2.0.0-RC1
-               │
-               ▼
-     GitHub Release (RC1)
-               │
-               ▼
-        QA Approval?
-        │             │
-       No            Yes
-        │             │
-        ▼             ▼
-   RC2/RC3...   Merge → main
-                      │
-                      ▼
-               Tag v2.0.0
-                      │
-                      ▼
-        GitHub Release (Final)
-                      │
-                      ▼
-     Customer / Manufacturing
-
-
----------------------------------------------------------------
-
-Permissions
-
-Not everyone should have the same access.
-
-Typical roles:
-
-Developer: Push feature branches, open PRs.
-Reviewer/Tech Lead: Approve PRs.
-Release Manager: Create release branches, tags, GitHub Releases.
-Admin: Manage repository settings.
-
----------------------------------------------------------------
-
-
-Artifact Naming
-
-Be consistent.
-
-Example:
-
-Product_v2.0.0_RC1.bin
-Product_v2.0.0_RC1.wic
-Product_v2.0.0_RC1.zip
-
-Instead of generic names like firmware.bin.
-
-
----------------------------------------------------------------
-
-Code Review Checklist
-
-Reviewers typically check:
-
-Does it work?
-Is the code readable?
-Any memory leaks?
-Thread safety?
-Error handling?
-Documentation updated?
-Tests added?
-
----------------------------------------------------------------
-
-QA Test Plan
-
-QA should know:
-
-What to test
-Which board/version
-Test cases
-Expected results
-Pass/Fail status
-
----------------------------------------------------------------
-
-Versioning
-
-Use Semantic Versioning:
-
-v1.0.0
-v1.0.1
-v1.1.0
-v2.0.0
-
-Where:
-
-Major = breaking changes
-Minor = new features
-Patch = bug fixes
-
----------------------------------------------------------------
-
-
-Issue Tracking
-
-Before creating a feature branch:
-
-Issue #125
-Add CG5317 Driver
-
-Then create:
-
-feature/125-cg5317-driver
-
-When merging:
-
-Closes #125
-
-GitHub automatically closes the issue.
-
-
----------------------------------------------------------------
-
-Branch Protection ✅ (Must Have)
-
-Protect these branches:
-
-main
-develop
-release/*
-
-Rules:
-
-No direct pushes
-Pull Request required
-At least 1–2 approvals
-CI must pass
-No force pushes
-No deleting protected branches
-
-
----------------------------------------------------------------
-
-Pull Request Template
-
-Every PR should answer questions like:
-
-## What changed?
-
-## Why is this change needed?
-
-## How was it tested?
-
-## Related Issue
-
-## Screenshots (if UI)
-
-This helps reviewers understand the change quickly.
-
-
----------------------------------------------------------------
-
-
-Changelog
-
-Maintain a CHANGELOG.md.
-
-Example:
-
-v2.0.0
-
-Added
-- tla driver
-- BQ25672 support
-
-Fixed
-- Ethernet timeout
-
-Changed
-- Yocto upgraded to Scarthgap
-
-Customers and QA can quickly see what's new
-
----------------------------------------------------------------
-
-
-CI Checks
-
-Your CI shouldn't just build. It can also:
-
-Compile the code
-Run unit tests
-Check code formatting
-Run static analysis
-Verify licenses
-Generate documentation
-Package release artifacts
-
-A PR should only be merged if these checks pass.
-
-
----------------------------------------------------------------
-
-Release Notes
-
-Every RC and every final release should have release notes.
-
-Include:
-
-Version
-New features
-Fixed bugs
-Known issues
-Upgrade instructions
-Supported hardware
-
----------------------------------------------------------------
-
-
-
-GitHub Releases
-
-Each release should contain:
-
-Release Notes
-Binary files (.bin, .exe, .wic, etc.)
-Checksums (SHA256)
-Source code (optional)
-Documentation (optional)
-
-
----------------------------------------------------------------
-
-
-Milestones (Optional but Useful)
-
-Group issues into releases.
-
-Example:
-
-Milestone
-
-v2.0.0
-
-✓ Issue 12
-✓ Issue 13
-✓ Issue 15
-
-When all issues in the milestone are closed, you're ready to create the release branch.
-
-
----------------------------------------------------------------
-
-
-If you're using GitHub, I'd also enable:
-
-Protected branches
-Required status checks before merging
-Required code review approvals
-Automatic deletion of merged feature branches
-Signed tags for official releases (optional but useful)
-Dependabot/security scanning (if applicable)
-
-
----------------------------------------------------------------
-
-Hotfix Flow
-
-If production has a critical issue:
-
-
-main
-   │
-   ▼
-hotfix/2.0.1
-   │
-   ▼
-QA
-   │
-   ▼
-main
-   │
-   └──► develop
-
-
-Always merge the hotfix back into both main and develop so the fix isn't lost.
----------------------------------------------------------------   
-
-
-
-Notifications:
-
-
-using GitHub, a clean workflow would be:
-
-Build succeeds → GitHub Actions uploads artifacts.
-GitHub Actions automatically sends a notification (email, Slack, or Teams) with the build number and artifact link.
-Release Candidate created → GitHub Release is published and QA is notified.
-QA completes testing → They update the ticket to "Passed" or "Failed" and attach the test report.
-Final release published → Customers or internal stakeholders are notified according to your distribution process.
-
----------------------------------------------------------------
-
-
-CI Sends Notifications (Most Common)
-
-When CI finishes successfully, it sends notifications.
-
-Examples:
-
-📧 Email
-Slack
-Microsoft Teams
-Google Chat
-Discord (less common in enterprises)
-
-Example email:
-
-Subject: Build #302 Succeeded
-
-Project: TBSI Firmware
-Branch: release/2.0
-Build: #302
-
-Artifacts:
-firmware.bin
-Image.wic
-
-Status: SUCCESS
-
-If the build fails:
-
-Subject: Build #302 Failed
-
-Everyone knows immediately.
-
-
----------------------------------------------------------------
-
-
-Example flow:
-
-Developer
-     │
-     ▼
-Merge → release/2.0
-     │
-     ▼
-GitHub Actions
-     │
-     ▼
-Build #302
-     │
-     ▼
-Artifacts Uploaded
-     │
-     ▼
-Email + Slack Notification
-     │
-     ▼
-QA Downloads Artifact
-     │
-     ▼
-Testing
-
----------------------------------------------------------------
-
-
-For an RC
-
-Developer
-     │
-     ▼
-Create Tag v2.0.0-RC1
-     │
-     ▼
-GitHub Release Created
-     │
-     ▼
-Email + Slack + Jira Notification
-     │
-     ▼
-QA Starts RC Testing
-
-
----------------------------------------------------------------
-
-
-For the final release
-
-
-Release Manager
-     │
-     ▼
-Tag v2.0.0
-     │
-     ▼
-GitHub Release Published
-     │
-     ▼
-Customer Notification
-     │
-     ▼
-Download Available
-
-
----------------------------------------------------------------
-
-The workflow trigger in your current ci-cd.yml still only listens to branches defined in the ci-cd.yml file
-
-
-
-Project files:
-
-Step 1: 
-
-Set up Conventional Commits + Semantic Versioning
-
-commit style.
-Using the below format for commits:
-
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Why This Project](#why-this-project)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [How to Run Locally](#how-to-run-locally)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Branching Strategy](#branching-strategy)
+- [Release Process](#release-process)
+- [Conventional Commits & Changelog](#conventional-commits--changelog)
+- [Git Command Reference](#git-command-reference)
+- [Project Documentation (V-Model)](#project-documentation-v-model)
+- [Roadmap / To Do](#roadmap--to-do)
+- [Contributing](#contributing)
+
+---
+
+## Project Overview
+
+This repository contains a banking system application, originally written as a C++ prototype, converted into a modular, portable, MISRA-oriented **C** codebase. The project demonstrates:
+
+- Requirements-driven development following a **V-Model SDLC** (BRS → SRS → HLD → LLD → Coding → Unit Testing → Functional Testing → UAT → RTM)
+- A modular C architecture with a strict I/O-separation principle for testability
+- **120 unit tests** and **15 functional/system tests**, all passing
+- Static analysis and MISRA C compliance checking via `cppcheck`
+- Automated code formatting checks via `clang-format`
+- Code coverage via `gcov`/`gcovr`
+- A full GitHub Actions CI/CD pipeline with automated, versioned releases
+
+## Why This Project
+
+- To learn and demonstrate industry-standard CI/CD practices for a C application
+- To show a complete, realistic V-Model SDLC applied to a non-trivial rewrite, not just a toy example
+- To serve as a portable, cross-machine reference for future C/embedded projects
+- To document, in detail, the real engineering decisions and trade-offs made along the way (see `docs/design/HLD.md` and `docs/design/LLD.md`)
+
+## Project Structure
+
+```
+banking-system-ci-cd-pipeline/
+├── .github/
+│   ├── workflows/
+│   │   ├── ci-cd.yml            # Build, test, static analysis, coverage — runs on every push/PR
+│   │   ├── release.yml          # Automated versioned releases — runs on tag push
+│   │   └── commit-lint.yml      # Enforces Conventional Commits on PRs into main/master
+│   └── (issue & PR templates, if present)
+├── docs/                        # Full V-Model SDLC documentation (see below)
+│   ├── README.md
+│   ├── requirements/BRS_SRS.xlsx
+│   ├── design/HLD.md, LLD.md
+│   ├── testing/unit_test_cases.xlsx, functional_test_cases.xlsx, uat_checklist.xlsx
+│   ├── traceability/RTM.xlsx
+│   └── release-notes/
+├── src/                         # Application source (.c) — account, address, admin,
+│                                #   bill_queue, cash_queue, main, platform, ui_screens
+├── include/                     # Public headers, matching src/ one-to-one, plus
+│                                #   common.h and the test-only ui_screens_internal.h
+├── tests/                       # Unity-based unit tests, one file per module
+│                                #   (120 tests total across 7 executables)
+├── scripts/                     # Local automation: run_all.bat, static_code_analysis.bat,
+│                                #   requirements.bat
+├── static_code_analysis/        # cppcheck/MISRA config (misra-config.json, misra.txt)
+│                                #   and the cppcheck-htmlreport generator
+├── CMakeLists.txt                # Build configuration (fetches Unity via FetchContent)
+├── .clang-format                 # Code style (Google-based, 4-space indent)
+├── .commitlintrc.json             # Conventional Commits rule config
+├── cliff.toml                     # git-cliff changelog generation config
+├── CHANGELOG.md                   # Auto-generated by git-cliff from conventional commits
+├── .gitignore
+└── README.md                      # This file
+```
+
+> **Note:** an earlier version of this project vendored the Unity test framework directly
+> under a `unity/` folder. This has since been replaced — `CMakeLists.txt` now fetches the
+> real, official [ThrowTheSwitch/Unity](https://github.com/ThrowTheSwitch/Unity) framework
+> via CMake's `FetchContent`, pinned to a specific release tag, rather than a hand-vendored
+> copy. `reports/`, `release/`, and `build/` are all generated output — intentionally
+> `.gitignore`'d, never committed (see [Project Documentation](#project-documentation-v-model)
+> for why).
+
+## Prerequisites
+
+To build and run this project locally on Windows, you need:
+
+| Tool | Used For | Notes |
+|---|---|---|
+| [MSYS2](https://www.msys2.org/) (MinGW64) | GCC compiler, build toolchain | Install to the default path (`C:\msys64`) for scripts to find it automatically |
+| [CMake](https://cmake.org/) | Build system generator | Any recent 3.x version |
+| A standard Python 3 install (python.org) | Running `gcovr` and the cppcheck HTML report generator | **Do not rely solely on MSYS2's Python** — it lacks prebuilt wheels for `lxml`/`gcovr`'s dependencies. The project's scripts auto-detect and prefer a non-MSYS2 Python on `PATH` |
+| [LLVM](https://releases.llvm.org/) | `clang-format` | Needed for the code formatting check |
+| [Cppcheck](https://cppcheck.sourceforge.io/) | Static analysis + MISRA checking | Install via the official installer, not via Chocolatey (Chocolatey's package has a broken `FILESDIR` and incomplete MISRA addons — see CI/CD Pipeline notes below) |
+| Git | Version control | Any recent version |
+
+No manual Unity framework setup is needed — `CMakeLists.txt` fetches it automatically at configure time.
+
+## How to Run Locally
+
+```powershell
+# Full pipeline: requirements check, formatting, static analysis + MISRA,
+# build, unit tests, coverage, release artifact packaging
+scripts\run_all.bat
+
+# Static analysis + MISRA only
+scripts\static_code_analysis.bat
+
+# Requirements/tooling check only
+scripts\requirements.bat
+```
+
+`run_all.bat` performs, in order:
+1. Requirements check (installs `pygments`/`gcovr` via a portable, MSYS2-aware Python detection if missing)
+2. Cleans previous `build/`, `reports/`, `release/`
+3. Code formatting check (`clang-format`)
+4. Static analysis + MISRA (`cppcheck`, HTML reports generated)
+5. CMake configure + build (all modules + all test executables)
+6. Unit tests (`ctest`)
+7. Runs the main program once (smoke test)
+8. Code coverage report (`gcovr`)
+9. Packages release artifacts (`.exe`, `.obj`, `.bin`) into `release/`
+
+## CI/CD Pipeline
+
+### `ci-cd.yml` — runs on every push and pull request to `main`, `develop`, `release/*`
+
+```
+Checkout
+  → Setup MSYS2 (GCC, CMake, Python)
+  → Install Tools (LLVM via choco, gcovr)
+  → Install cppcheck (official MSI release + MISRA addons — NOT choco;
+     choco's package has a broken FILESDIR and incomplete addons)
+  → Verify cppcheck + MISRA addon present
+  → Prepare report directories
+  → Code Formatting Check (clang-format --dry-run --Werror)
+  → Static Analysis + MISRA (scripts\static_code_analysis.bat)
+  → Build (CMake + GCC, MinGW Makefiles)
+  → Run Unit Tests (ctest --output-on-failure)
+  → Run Program & Coverage (piped, non-interactive input; gcovr report)
+  → Create Release Artifacts (.exe copies)
+  → Upload All Reports and Release Artifacts (GitHub Actions artifact)
+  → Send Notification (email, on success or failure)
+```
+
+Key hardening applied to this workflow over the course of development:
+- `concurrency` group configured to cancel superseded runs on rapid successive pushes
+- `timeout-minutes` set at job and step level to avoid runaway/hung steps
+- Program execution during the coverage step uses piped, non-interactive input specifically
+  because the compiled program is fully interactive — running it with closed/empty stdin
+  (as CI does by default) is handled gracefully by the application itself (see
+  `ui_is_input_exhausted()` in `docs/design/LLD.md`), rather than looping forever
+- cppcheck is installed from the official GitHub release MSI, with its `addons` folder
+  explicitly re-synced from the matching source release, because the Chocolatey package
+  and even some MSI releases have historically shipped with an incomplete or broken
+  addons folder (no `misra.py`) or a hardcoded, non-portable `FILESDIR`
+
+### `release.yml` — runs on tag push (`v*`)
+
+```
+Checkout
+  → Extract version from tag
+  → Build (Release configuration)
+  → Create binary files (.bin via objcopy) & rename with version
+  → Generate Changelog (git-cliff)
+  → Determine target branch for changelog commit
+      (tag contains "-rc" → release/<major>.<minor>; else → main)
+  → Commit and push updated CHANGELOG.md to that branch
+  → Create GitHub Release (attaches .exe/.bin/coverage report/CHANGELOG.md)
+      prerelease flag set automatically if tag contains "rc"
+  → Send Notification
+```
+
+### `commit-lint.yml` — runs on pull requests into `main`/`master`
+
+Enforces [Conventional Commits](https://www.conventionalcommits.org/) formatting on every commit in a PR, using `wagoid/commitlint-github-action` and the rules in `.commitlintrc.json`.
+
+## Branching Strategy
+
+This project follows a Git Flow–style model:
+
+```
+feature/<name>
+      │
+      ▼
+   develop  ──────────────────────────────────►  (ongoing integration)
+      │
+      ▼  (feature freeze — all planned work for this version is in)
+release/x.y
+      │
+      ├── QA builds (untagged pushes; CI produces build artifacts for QA to test)
+      │
+      ▼  (once stable enough for formal QA sign-off)
+   v x.y.z-rc1, -rc2, -rc3, ...  (tagged; triggers release.yml, produces a GitHub
+      │                           pre-release with attached artifacts)
+      ▼  (final RC approved)
+    main  ─── tag v x.y.z (production release)
+      │
+      └──► develop  (sync back, so the release's changes are never lost)
+```
+
+**Rules:**
+- Feature branches merge into `develop` via pull request
+- `release/x.y` is created from `develop` once features for that version are frozen — only bug fixes land on it from that point on
+- Every push to `release/x.y` produces an **untagged QA build** (CI artifact) — used for internal QA iteration, not versioned
+- Once QA considers a build stable, it gets tagged as a **Release Candidate** (`vX.Y.Z-rc1`, `-rc2`, ...) — this **does** trigger `release.yml` and publishes a GitHub pre-release
+- Once the final RC passes, `release/x.y` merges into `main` (`--no-ff`), gets tagged as the **production release** (`vX.Y.Z`, no `-rc` suffix), and that same content is synced back into `develop`
+- `release/x.y` is deleted once fully merged and synced
+
+**Branch protection** (recommended, see [Roadmap](#roadmap--to-do)): protect `main`, `develop`, and `release/*` — require CI to pass, disallow direct pushes and force-pushes, require PR review.
+
+## Release Process
+
+Three distinct kinds of build exist in this project, each with a different purpose and a different CI trigger:
+
+| Kind | Trigger | Purpose | Where to find it |
+|---|---|---|---|
+| **QA build** | Any push to `release/x.y` (no tag) | Internal iteration — QA downloads and tests, bugs get fixed on the same branch | GitHub Actions → that run's **Artifacts** |
+| **Release Candidate (RC)** | Tag push `vX.Y.Z-rcN` | Formal, versioned snapshot for thorough QA sign-off before production | GitHub **Releases** page, marked as *pre-release* |
+| **Production Release** | Tag push `vX.Y.Z` (no `-rc`) | Final, customer/deployment-ready release | GitHub **Releases** page |
+
+A `CHANGELOG.md` is automatically generated and committed back to the correct branch (`release/x.y` for RC tags, `main` for production tags) on every tag push, using `git-cliff` — see `cliff.toml`.
+
+**Promoting the final RC to production** (no new commits since the last RC) requires an empty commit so `git-cliff` has something to log under the new version:
+
+```bash
+git switch main
+git pull origin main
+git merge release/x.y --no-ff -m "Release vX.Y.Z"
+git commit --allow-empty -m "chore: promote vX.Y.Z-rcN to production as vX.Y.Z"
+git push origin main
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+## Conventional Commits & Changelog
+
+All commits follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
 feat: add new feature
 fix: bug fix
 docs: update documentation
-chore: maintenance
+chore: maintenance, tooling, or process changes
+```
 
-This enables automatic changelog and versioning.
+This is enforced on pull requests into `main`/`master` via `commit-lint.yml`, and drives fully automated changelog generation via `git-cliff` (`cliff.toml`) on every tagged release.
 
+## Git Command Reference
 
-Step 2: release.yml
+A working reference of the Git commands actually used throughout this project's development, organized by task.
 
-Automated Release Setup
-GitHub Actions workflow for automated releases.
-Create a new file: .github\workflows\release.yml
+### Basic setup
 
-
-git add .github\workflows\release.yml
-git commit -m "chore: add automated release workflow"
-git push
-
-git tag v1.0.0
-git push origin v1.0.0
-
-This will automatically create a release with artifacts.
-
-
-
-Step 3: commit-lint.yml
-
-Conventional Commits Enforcement
-Create .github/workflows/commit-lint.yml
-
-
-
-Step 5: 
-
-Create .commitlintrc.json (root folder)
-
-
-
-Step 6: 
-
-Automatic Changelog + Release Workflow
-Update or create .github\workflows\release.yml
-
-
-git add .github .commitlintrc.json
-git commit -m "chore: add conventional commits and automated release with changelog"
-git push
-
-
-
-Step 7: cliff.toml
-
-cliff.toml file for automated changelog generation
-
-
-git add cliff.toml
-git commit -m "chore: add automated changelog configuration"
-git push
-
-
-
-Project follows the below:
-
-Conventional Commits - Added Conventional Commits enforcement
-Automated Changelog - Added automated changelog (cliff.toml)
-Automated Releases - Added automated release workflow
-Semantic Versioning - Tagged and pushed v1.0.0
-
-
-push commands:
-
-git tag v1.0.0
-git push origin v1.0.0
-
----------------------------
-
-if any fix identified and then do the fix:
-
-
-git add .github\workflows\release.yml
-git commit -m "fix: simplify release workflow with proper permissions"
-git push
-git tag -f v1.0.0
-git push origin v1.0.0 --force
-
-
----------------------------
-
-if any feature identified to be implemented:
-
-git add .github\workflows\release.yml
-git commit -m "feat: include .bin files in release"
-git push
-git tag -f v1.0.0
-git push origin v1.0.0 --force
-
-
----------------------------
-
-Delete the existing tag (or use a new version like v1.0.1)
-
-Run this locally:
-PowerShellgit tag -d v1.0.0
-git push origin --delete v1.0.0
-
-then implement the feature:
-
-git add .github\workflows\release.yml
-git commit -m "feat: include .bin files in automated release"
-git push
-git tag v1.0.1
-git push origin v1.0.1
-
-
----------------------------
-
-when there is update in the README file
-
-git add README.md
-git commit -m "docs: improve README with full tutorial and documentation"
-git push
-
-
-
-When to use the tag commands?
-Only when you want to trigger an automated release:
-You can run them only when you want to create a new release.
-git tag v1.0.1
-git push origin v1.0.1
-
-
----------------------------------------------------------------
-
-
-git cmds in this project so far:
-
-
-# to stage all new, modified, and deleted files or changes
+```bash
 git add .
-
-# creates main branch
-git branch -M main
-
-
-
-# exmaple commit msg
 git commit -m "feat: include .bin files in automated release"
-
 git status
+git branch          # local branches
+git branch -a       # local + remote branches
+```
 
-# to see list of local branches
-git branch 
+### Creating and syncing branches
 
-# to see remote branches
-git branch -a 
-
----------------------------
-
-# Make sure you are on release branch
-git checkout release/1.0
- 
-# Pull latest changes
-git pull origin release/1.0
- 
-# Switch to main
-git checkout main
- 
-# Merge release into main
-git merge release/1.0 --no-ff -m "Release v1.0.2"
- 
-# Push main
-git push origin main
-
-# create final release tag
-git tag v1.0.2
-git push origin v1.0.2
-
-
----------------------------
-
-# Switch to develop branch
-git checkout develop
- 
-# Pull latest changes
-git pull origin develop
-
-
----------------------------
-
-
-# create and checkout to the branch
+```bash
+# Create develop and link it to GitHub
 git checkout -b develop
-
-# Link your local develop to GitHub's develop
 git push -u origin develop
 
-# Switch to develop branch
-git checkout develop
-# Get latest changes from GitHub          
-git pull origin develop       
-
----------------------------
-
-<<<<<<< HEAD
-# cmds for normal release: 
-=======
-# For normal release: 
->>>>>>> release/3.0
-git tag v1.0.0
-git push origin v1.0.0
-
-# cmds for Release Candidate:
-git tag v1.0.0-rc1
-git push origin v1.0.0-rc1
-
----------------------------
-
-
-# made some changes in any branch by mistake, and relaised, not commited, and want to restore your working tree to the last commit and all uncommitted changes will be lost.
-
-git restore .
-
-# If you also created new untracked files:
-
-git clean -fd
-
-
----------------------------
-
-# Save uncommitted changes
-git stash          
-
-
-
-git stash
-
-Temporarily saves your modified files and restores your working directory to the last committed state.
-
-Before:
-
-main
- ├── modified file1.c
- ├── modified file2.c
-
-Run:
-
-git stash
-
-After:
-
-Your modifications are saved in a stash.
-Your working directory becomes clean.
-
-# Move to develop branch
-git switch develop 
-
-# Apply the saved changes on develop
-git stash pop      
-
-
-
-git stash pop
-
-Restores the most recently stashed changes onto your current branch and removes that stash from the stash list.
-
-git stash pop
-
-After this, your changes appear on develop.
-
----------------------------
-
-# for merging, releasing
-git switch release/3.0
-git pull origin release/3.0
-git merge develop
-git push origin release/3.0
-git tag v3.0.1-rc1
-git push origin v3.0.1-rc1
-
----------------------------
-
-
-git wrokflow I followed in this project
-
-Develop features on feature/*
-Merge features into develop
-Create release/x.y
-Generate RC1, RC2, etc. from release/x.y
-Apply QA bug fixes only on release/x.y
-Merge release/x.y → main (production)
-Tag the production release (vX.Y.Z)
-Merge release/x.y → develop
-Delete release/x.y
-
-
-
-As below:
-
-
-Important distinction between **internal QA builds**, **Release Candidates (RCs)** and **Production Release**
-
-
-
----
-
-# Phase 1: Development
-
-```text
-develop
-   │
-   ├── Feature A
-   ├── Feature B
-   ├── Feature C
+# Standard sync pattern for any branch
+git switch <branch>
+git pull origin <branch>
 ```
 
-When all planned features for 4.0.1 are complete:
+### Creating a release branch
 
 ```bash
-git switch develop
-git switch -c release/4.0
-git push -u origin release/4.0
-```
-
-At this point, **feature development for 4.0.1 is frozen**. Only bug fixes go into `release/4.0`.
-
----
-
-# Phase 2: QA Builds
-
-Your CI can generate builds like:
-
-```text
-Build #101
-Build #102
-Build #103
-Build #104
-```
-
-or
-
-```text
-QA-001
-QA-002
-QA-003
-```
-
-These are **internal builds** for testers.
-
-Example:
-
-```text
-Build #101
-↓
-QA finds 20 bugs
-
-Fix bugs
-
-Build #102
-↓
-QA finds 10 bugs
-
-Fix bugs
-
-Build #103
-↓
-QA finds 3 bugs
-
-Fix bugs
-
-Build #104
-↓
-No major bugs
-```
-
-These builds usually **are not tagged** because they're just intermediate verification builds.
-
----
-
-# Phase 3: Release Candidates
-
-Once the team believes the software is stable enough to be a release candidate:
-
-
-```bash
-
-
-git add README.md 
-git commit -m "fix: updated README.md file"
-git push
-git tag v4.0.1-rc1
-git push origin v4.0.1-rc1
-```
-
-```text
-v4.0.1-rc1
-```
-
-QA performs a much more thorough validation.
-
-If bugs are found:
-
-```text
-Fix
-↓
-
-v4.0.1-rc2
-
-Fix
-↓
-
-v4.0.1-rc3
-
-Fix
-↓
-
-v4.0.1-rc4
-
-Fix
-↓
-
-v4.0.1-rc5
-```
-
-If RC5 passes:
-
-```text
-git switch main
-git merge release/4.0 --no-ff
-git tag v4.0.1
-git push origin main --tags/git push origin v4.0.1
-```
-
-Production release:
-
-```text
-v4.0.1
-```
-
----
-
-# Timeline
-
-```text
-develop
-    │
-    └──────────────┐
-                   ▼
-             release/4.0
-                   │
-                   │
-            Build #101
-                   │
-            Build #102
-                   │
-            Build #103
-                   │
-            Build #104
-                   │
-                   ▼
-               v4.0.1-rc1
-                   │
-               v4.0.1-rc2
-                   │
-               v4.0.1-rc3
-                   │
-               v4.0.1-rc4
-                   │
-               v4.0.1-rc5
-                   │
-                   ▼
-                v4.0.1
-                   │
-             Merge to main
-```
-
----
-
-# Approach
-
-Handling releases:
-
-* One `release/4.0` branch.
-* Multiple bug-fix commits on that branch.
-* Multiple builds while QA tests.
-* Multiple RCs if necessary.
-* Final production tag after the last RC is approved.
-
-The only adjustment I'd make is this:
-
-* **QA builds** (Build #101, #102, etc.) are identified by the CI system's build number
-* **RCs** (`v4.0.1-rc1`, `v4.0.1-rc2`, ...) are tagged, they represent candidate release snapshots.
-
----
-
-## GitHub Actions CI/CD pipeline 
-
-Based on the CI/CD pipeline building, a practical convention would be:
-
-* Push to `release/4.0` → CI generates **Build #xxx** artifacts automatically for QA.
-* When you decide a build is release-candidate quality, create a tag:
-
-  * `v4.0.1-rc1`
-  * `v4.0.1-rc2`
-  * …
-* When the final RC is approved:
-
-  * Merge `release/4.0` → `main`
-  * Create tag `v4.0.1`
-  * CI generates the production artifact.
-
-
-```bash
-
-
-
-Create the release branch
-
 git switch develop
 git pull origin develop
-git switch -c release/4.0
-git push -u origin release/4.0
-
-Pulling develop first ensures your release branch starts from the latest integrated code.
-
--
--
--
--
-
-QA finds bugs
-
-Fix them on release/4.0
-
-git add .
-git commit -m "fix: updated README.md"
-git push
-
-Your CI can automatically produce a QA build from this push.
-
--
--
--
--
-
-Create RC1
-
-Once you decide this specific commit is a Release Candidate:
-
-git tag v4.0.1-rc1
-git push origin v4.0.1-rc1
-
-Your CI should be configured so that pushing an *-rc* tag generates the RC artifact.
-
--
--
--
--
-
-QA tests RC1
-
-If bugs are found:
-
-git add .
-git commit -m "fix: resolve login issue"
-git push
-
-CI generates another QA build.
-
-When you're ready for another release candidate:
-
-git tag v4.0.1-rc2
-git push origin v4.0.1-rc2
-
-Repeat as needed:
-
-v4.0.1-rc1
-v4.0.1-rc2
-v4.0.1-rc3
-v4.0.1-rc4
-v4.0.1-rc5
-
+git switch -c release/x.y
+git push -u origin release/x.y
 ```
 
-Final Release
-
-When the last RC is approved:
+### Tagging
 
 ```bash
+# Release Candidate
+git tag vX.Y.Z-rc1
+git push origin vX.Y.Z-rc1
+
+# Production release
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# Re-tagging after a fix (force)
+git tag -f v1.0.0
+git push origin v1.0.0 --force
+```
+
+### Promoting a release branch to `main`
+
+```bash
+git switch release/x.y
+git pull origin release/x.y        # pick up any CI-pushed commits (e.g. changelog)
 git switch main
 git pull origin main
-git merge release/4.0 --no-ff -m "Release v4.0.1"
-git tag v4.0.1
-git push origin main
-git push origin v4.0.1
+git merge release/x.y --no-ff -m "Release vX.Y.Z"
 
--
--
--
--
--
-
-# merging release with main and commiting main with production release version so that CHANGELOG.md gets updated with release version 
-# ── Step 1: Make sure your local release branch has everything, including CI's changelog commits ──
-git switch release/7.0
-git pull origin release/7.0
- 
-# ── Step 2: Switch to main and make sure it's current ──
-git switch main
-git pull origin main
- 
-# ── Step 3: Merge the release branch into main ──
-git merge release/7.0 --no-ff -m "Release v7.0.1"
- 
-# ── Step 4 (ONLY if a conflict appears, usually on CHANGELOG.md): resolve by taking release branch's version ──
+# Only if CHANGELOG.md conflicts — take the release branch's version
 git checkout --theirs CHANGELOG.md
 git add CHANGELOG.md
-git commit -m "Release v7.0.1"
- 
-# ── Step 5: Add an empty commit so git-cliff has something to log under the new production version ──
-git commit --allow-empty -m "chore: promote v7.0.1-rc1 to production as v7.0.1"
- 
-# ── Step 6: Push main ──
+git commit -m "Release vX.Y.Z"
+
+# Only if promoting with zero new commits since the last RC
+git commit --allow-empty -m "chore: promote vX.Y.Z-rcN to production as vX.Y.Z"
+
 git push origin main
- 
-# ── Step 7: Tag the production release and push the tag (this triggers the Release workflow) ──
-git tag v7.0.1
-git push origin v7.0.1
-
--
--
--
--
--
-
-Then synchronize the branches:(sync release with develop)
-
-git switch develop
-git pull origin develop
-git merge release/4.0
-git push origin develop
-
--
--
--
--
-
-Then synchronize the branches:(sync main with develop)
-
-git switch develop
-git pull origin develop
-git merge main --no-ff -m "Sync develop with main after v8.0.0"
-git push origin develop
-
-Finally, if you no longer need it:
-
-git branch -d release/4.0
-git push origin --delete release/4.0
-
-
-
-## This gives you <commits only in main>  <commits only in develop>. If both are 0, they're fully in sync.
-git fetch origin
-git rev-list --left-right --count origin/main...origin/develop
-
--
--
--
--
-
-# For details on what's different (if anything):
-git log origin/develop..origin/main --oneline
-# Shows commits on main that develop doesn't have.
-
-git log origin/main..origin/develop --oneline
-# Shows commits on develop that main doesn't have.
-
-
-# To confirm actual file content is identical (not just commit count):
-git diff origin/main origin/develop
-# Empty output = no real differences, regardless of commit count (merge commits can differ in count while content stays identical, like you saw last time).
-
-
-
-
-
-
-
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
 
-Clear separation between everyday QA builds, formally versioned release candidates and production releases
+### Syncing branches after a release
 
----------------------------
-
-Deleting branches and tags:
-
-# 1. Switch to develop
-git checkout develop
-
-# 2. Pull latest from remote develop (just in case)
+```bash
+# Sync release branch back into develop
+git switch develop
 git pull origin develop
+git merge release/x.y
+git push origin develop
 
-# 3. Delete local release/5.0 branch
-git branch -D release/5.0
+# Sync main back into develop (after a production release)
+git switch develop
+git pull origin develop
+git merge main --no-ff -m "Sync develop with main after vX.Y.Z"
+git push origin develop
+```
 
-# 4. Delete remote release/5.0 branch
-git push origin --delete release/5.0
+### Checking whether two branches are in sync
 
-# 5. Delete the test tag (optional but clean)
-git tag -d v5.0.0-rc1
-git tag -d v5.0.0-rc2
-git tag -d v5.0.0-rc3
-git push origin --delete v5.0.0-rc1
-git push origin --delete v5.0.0-rc2
-git push origin --delete v5.0.0-rc3
+```bash
+git fetch origin
+git rev-list --left-right --count origin/main...origin/develop   # 0  0 = fully in sync
 
----------------------------
+git log origin/develop..origin/main --oneline   # commits main has that develop doesn't
+git log origin/main..origin/develop --oneline   # commits develop has that main doesn't
 
-Resetting develop branch to match main:(because develop was modified and pushed to repo, and then releaase/5.0 was created from develop locally and release/5.0 failed and deprecated because of enough bugs, so release/5.0 is deleted everywhere and now develop was synchronized to match main(v4.0.1 - which has a stable production code)
-Reset develop branch to match main (since release/4.0 is already merged to main)
+git diff origin/main origin/develop             # empty output = content is identical
+```
 
-Make sure you are on develop
+### Cleaning up a finished release branch
+
+```bash
+git branch -d release/x.y
+git push origin --delete release/x.y
+```
+
+### Deleting branches and tags (e.g. an abandoned/failed release)
+
+```bash
 git checkout develop
+git pull origin develop
+git branch -D release/x.y
+git push origin --delete release/x.y
 
-# Reset develop to main (this will remove all unwanted changes from release/5.0 experiment)
+git tag -d vX.Y.0-rc1
+git push origin --delete vX.Y.0-rc1
+```
+
+### Resetting `develop` to match `main` (after an abandoned release experiment)
+
+```bash
+git checkout develop
 git reset --hard origin/main
-
-# Force push to update remote develop
 git push origin develop --force
+```
 
----------------------------
+### Discarding local changes
 
-Alternative (Merge main into develop):
+```bash
+git restore .      # discard uncommitted modifications to tracked files
+git clean -fd      # also remove new untracked files
+```
 
-# You can do merge instead, but it's not as clean in this situation.
+### Stashing work in progress
 
-git checkout develop
-git merge main --no-ff -m "Merge main into develop (cleanup)"
-git push
+```bash
+git stash          # save uncommitted changes, restore clean working directory
+git switch <branch>
+git stash pop      # re-apply the stashed changes here
+```
 
-# But this will create an extra merge commit and keep unnecessary history.
+### Hotfix flow (critical production bug)
 
----------------------------
+```
+main → hotfix/x.y.z → QA → main → develop
+```
+Always merge a hotfix back into **both** `main` and `develop` so the fix isn't lost on the next release.
 
+## Project Documentation (V-Model)
 
+This project follows a full V-Model SDLC. All requirements, design, and test documentation lives in `docs/` and is version-controlled alongside the code — see `docs/README.md` for the complete breakdown:
 
-=========
-To Do:  
-=========
+| Stage | Location |
+|---|---|
+| Business & Software Requirements (BRS/SRS) | `docs/requirements/BRS_SRS.xlsx` |
+| Architecture + High-Level Design (HLD) | `docs/design/HLD.md` |
+| Low-Level Design (LLD) | `docs/design/LLD.md` |
+| Unit Test Cases (120 tests) | `docs/testing/unit_test_cases.xlsx` |
+| Functional Test Cases (15 scenarios) | `docs/testing/functional_test_cases.xlsx` |
+| UAT Checklist | `docs/testing/uat_checklist.xlsx` |
+| Requirement Traceability Matrix (RTM) | `docs/traceability/RTM.xlsx` |
 
-The whole list formatted as a Markdown checklist — ready to drop straight into your `README.md`:
-
-```markdown
-## CI/CD Improvements — To Do
+## Roadmap / To Do
 
 ### High Impact
-- [ ] Add branch protection rules on `main` (and ideally `develop`) — require status checks to pass, block direct pushes, PR-only merges
-- [ ] Scope `permissions: contents: read` in `ci-cd.yml`
-- [ ] Add `concurrency` control to `ci-cd.yml` to cancel stale runs on rapid pushes
-- [ ] Add `timeout-minutes` at the job level in `ci-cd.yml`
+- [ ] Add branch protection rules on `main` (and ideally `develop`, `release/*`) — require status checks to pass, block direct pushes, PR-only merges
+- [ ] Scope `permissions: contents: read` explicitly in `ci-cd.yml`
+- [ ] Add a `LICENSE` file (currently missing — blocks legal reuse/contribution despite being public)
+- [ ] Add `CONTRIBUTING.md` with setup and PR guidelines
 
 ### Medium Impact
-- [ ] Make cppcheck actually fail the build on findings (`--error-exitcode=1` or scoped to `error` severity)
+- [ ] Make cppcheck actually fail the build on real findings (`--error-exitcode=1`, or scoped to `error` severity) rather than only informational reporting
 - [ ] Add caching (`actions/cache`) for MSYS2 packages, pip, and cppcheck install to speed up CI
 - [ ] Add `.github/dependabot.yml` to auto-update GitHub Actions versions
+- [ ] Publish static analysis/MISRA/coverage HTML reports to GitHub Pages for always-up-to-date public viewing
 
 ### Nice to Have
-- [ ] Add CI build status badge to `README.md`
-- [ ] Test both `Debug` and `Release` build types in `ci-cd.yml` (currently only `Debug` is tested; `release.yml` only builds `Release`)
-- [ ] Set explicit artifact `retention-days` (e.g. 14) instead of relying on GitHub's 90-day default
-```
+- [ ] Test both `Debug` and `Release` build configurations in `ci-cd.yml` (currently only `Debug` is tested; `release.yml` only builds `Release`)
+- [ ] Set explicit artifact `retention-days` instead of relying on GitHub's default
+- [ ] Add issue and pull request templates
+- [ ] Add a `CODE_OF_CONDUCT.md`
 
-Paste that into your `README.md` wherever makes sense — a new `## CI/CD Improvements` section near the top, or in a `CONTRIBUTING.md`/`TODO.md` if you keep those separate.
+## Contributing
 
+1. Fork the repository
+2. Create a feature branch: `feature/<short-description>`
+3. Follow [Conventional Commits](#conventional-commits--changelog) for every commit message
+4. Ensure `scripts\run_all.bat` passes locally before opening a PR
+5. Submit a pull request into `develop`
 
----------------------------
+See `docs/design/LLD.md` for the module structure and coding conventions (naming, I/O separation principle, error handling strategy) followed throughout this codebase.

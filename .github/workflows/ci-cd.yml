@@ -1,6 +1,5 @@
 name: Banking System CI/CD
 
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -11,133 +10,268 @@ on:
   pull_request:
     branches: [ main, develop, 'release/*' ]
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-test:
+  # =====================================================================
+  # Job 1: Code formatting check (fast, no build toolchain needed)
+  # =====================================================================
+  check_format:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LLVM (clang-format)
+        run: choco install llvm -y
+        shell: powershell
+
+      - name: Code Formatting Check
+        run: clang-format --dry-run --Werror src/*.c include/*.h
+        shell: cmd
+
+  # =====================================================================
+  # Job 2: Static analysis + MISRA (independent of the build toolchain)
+  # =====================================================================
+  static_analysis:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cppcheck (official release, avoids broken choco FILESDIR)
+        shell: pwsh
+        run: |
+          $version = "2.14.2"
+          $url = "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
+          Invoke-WebRequest -Uri $url -OutFile cppcheck.msi
+          Start-Process msiexec.exe -ArgumentList "/i cppcheck.msi /quiet /norestart" -Wait
+          echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+          $srcZipUrl = "https://github.com/danmar/cppcheck/archive/refs/tags/$version.zip"
+          Invoke-WebRequest -Uri $srcZipUrl -OutFile cppcheck-src.zip
+          Expand-Archive -Path cppcheck-src.zip -DestinationPath cppcheck-src -Force
+          robocopy "cppcheck-src\cppcheck-$version\addons" "C:\Program Files\Cppcheck\addons" /E /IS /IT
+          if ($LASTEXITCODE -ge 8) { exit 1 } else { $global:LASTEXITCODE = 0 }
+
+      - name: Verify cppcheck and addons
+        run: |
+          cppcheck --version
+          dir "C:\Program Files\Cppcheck\addons\misra.py"
+        shell: cmd
+
+      - name: Prepare Directories
+        run: mkdir -Force reports\static_code_check, reports\misra_check
+        shell: powershell
+
+      - name: Static Analysis + MISRA
+        run: scripts\static_code_analysis.bat
+        shell: cmd
+
+      - name: Upload Static Analysis Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-static-analysis
+          path: reports/
+
+  # =====================================================================
+  # Job 3: Build (Debug) + Unit Tests + Coverage
+  # =====================================================================
+  build_debug:
     runs-on: windows-latest
     timeout-minutes: 20
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        install: >-
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
 
-    - name: Install Tools
-      run: |
-        choco install llvm -y
-        python -m pip install gcovr
-      shell: powershell
+      - name: Install gcovr
+        run: |
+          choco install llvm -y
+          python -m pip install gcovr
+        shell: powershell
 
-    - name: Install cppcheck (official release, avoids broken choco FILESDIR)
-      shell: pwsh
-      run: |
-        $version = "2.14.2"
-        $url = "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
-        Invoke-WebRequest -Uri $url -OutFile cppcheck.msi
-        Start-Process msiexec.exe -ArgumentList "/i cppcheck.msi /quiet /norestart" -Wait
-        echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Append
+      - name: Prepare Directories
+        run: mkdir -Force reports\code_coverage, release
+        shell: powershell
 
-        $srcZipUrl = "https://github.com/danmar/cppcheck/archive/refs/tags/$version.zip"
-        Invoke-WebRequest -Uri $srcZipUrl -OutFile cppcheck-src.zip
-        Expand-Archive -Path cppcheck-src.zip -DestinationPath cppcheck-src -Force
-        robocopy "cppcheck-src\cppcheck-$version\addons" "C:\Program Files\Cppcheck\addons" /E /IS /IT
-        if ($LASTEXITCODE -ge 8) { exit 1 } else { $global:LASTEXITCODE = 0 }
+      - name: Build (Debug)
+        run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
+          cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build
+        timeout-minutes: 10
+        shell: cmd
 
-    - name: Verify cppcheck and addons
-      run: |
-        cppcheck --version
-        dir "C:\Program Files\Cppcheck\addons\misra.py"
-      shell: cmd
+      - name: Run Unit Tests
+        run: |
+          cd build
+          ctest --output-on-failure
+        timeout-minutes: 8
+        shell: cmd
 
-    - name: Prepare Directories
-      run: |
-        mkdir -Force reports\static_code_check, reports\misra_check, reports\code_coverage, release
-      shell: powershell
+      - name: Run Program & Coverage
+        run: |
+          echo "=== Running Banking System ==="
+          echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
 
-    - name: Code Formatting
-      run: clang-format --dry-run --Werror -i src/*.c include/*.h
-      shell: cmd
+          echo "=== Generating Coverage Report ==="
+          gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
 
-    - name: Static Analysis + MISRA
-      run: scripts\static_code_analysis.bat
-      shell: cmd
+          type program_output.txt
+        timeout-minutes: 6
+        shell: cmd
 
-    - name: Build
-      run: |
-        set PATH=C:\msys64\mingw64\bin;%PATH%
-        cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build
-      timeout-minutes: 10 
-      shell: cmd
+      - name: Create Release Artifacts (Debug)
+        run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
+          copy build\banking_system.exe release\banking_system.exe
+          copy build\test_address.exe release\test_address.exe
+          copy build\test_admin.exe release\test_admin.exe
+          copy build\test_platform.exe release\test_platform.exe
+          copy build\test_bill_queue.exe release\test_bill_queue.exe
+          copy build\test_cash_queue.exe release\test_cash_queue.exe
+          copy build\test_account.exe release\test_account.exe
+          copy build\test_ui_screens_internal.exe release\test_ui_screens_internal.exe
 
-    - name: Run Unit Tests
-      run: |
-        cd build
-        ctest --output-on-failure
-      timeout-minutes: 8
-      shell: cmd
+          objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
+          objcopy -O binary build\test_address.exe release\test_address.bin 2>nul
+          objcopy -O binary build\test_admin.exe release\test_admin.bin 2>nul
+          objcopy -O binary build\test_platform.exe release\test_platform.bin 2>nul
+          objcopy -O binary build\test_bill_queue.exe release\test_bill_queue.bin 2>nul
+          objcopy -O binary build\test_cash_queue.exe release\test_cash_queue.bin 2>nul
+          objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
+          objcopy -O binary build\test_ui_screens_internal.exe release\test_ui_screens_internal.bin 2>nul
+        shell: cmd
 
-    - name: Run Program & Coverage
-      run: |
-        echo "=== Running Banking System ==="
-        # Run with timeout and non-interactive input
-        echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
-          
-        echo "=== Generating Coverage Report ==="
-        gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
-          
-        type program_output.txt
-      timeout-minutes: 6
-      shell: cmd
+      - name: Upload Debug Build Reports and Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-coverage-and-release
+          path: |
+            reports/code_coverage/
+            release/
 
-    - name: Create Release Artifacts
-      run: |
-        set PATH=C:\msys64\mingw64\bin;%PATH%
-        copy build\banking_system.exe release\banking_system.exe
-        copy build\test_address.exe release\test_address.exe
-        copy build\test_admin.exe release\test_admin.exe
-        copy build\test_bill_queue.exe release\test_bill_queue.exe
-        copy build\test_cash_queue.exe release\test_cash_queue.exe
-        copy build\test_account.exe release\test_account.exe
+  # =====================================================================
+  # Job 4: Build (Release) — compile-only check, closes the Debug/Release
+  # matrix item on the roadmap. No tests/coverage here: Release strips
+  # debug info and doesn't use --coverage flags.
+  # =====================================================================
+  build_release:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
 
-        objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
-        objcopy -O binary build\test_address.exe release\test_address.bin 2>nul
-        objcopy -O binary build\test_admin.exe release\test_admin.bin 2>nul
-        objcopy -O binary build\test_bill_queue.exe release\test_bill_queue.bin 2>nul
-        objcopy -O binary build\test_cash_queue.exe release\test_cash_queue.bin 2>nul
-        objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
-      shell: cmd
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
 
-    - name: Upload All Reports and Release Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: all-reports-and-release
-        path: |
-          reports/
-          release/
+      - name: Build (Release)
+        run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
+          cmake -B build_release -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
+          cmake --build build_release
+        timeout-minutes: 10
+        shell: cmd
 
-    - name: Send Notification
-      if: always()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_APP_PASSWORD }}
-        subject: "[${{ github.ref_name }}] CI/CD - ${{ job.status }}"
-        to: smaddu27@gmail.com
-        cc: 19mskumar@gmail.com
-        from: GitHub Actions <no-reply@github.com>
-        body: |
-          Pipeline Status: ${{ job.status }}
-          Branch: ${{ github.ref_name }}
-          Commit: ${{ github.sha }}
-          Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        content_type: text/plain
+  # =====================================================================
+  # Job 5: Collect everything into one combined artifact, matching the
+  # existing "all-reports-and-release" name so nothing downstream breaks.
+  # =====================================================================
+  collect_artifacts:
+    needs: [check_format, static_analysis, build_debug, build_release]
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download static analysis reports
+        uses: actions/download-artifact@v4
+        with:
+          name: reports-static-analysis
+          path: combined/reports
+
+      - name: Download coverage report + release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: reports-coverage-and-release
+          path: combined
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-reports-and-release
+          path: |
+            combined/reports
+            combined/release
+
+  # =====================================================================
+  # Job 6: Publish reports to GitHub Pages (main branch only)
+  # =====================================================================
+  deploy_pages:
+    needs: collect_artifacts
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download combined artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: all-reports-and-release
+          path: combined
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: combined/reports
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # =====================================================================
+  # Job 7: Notification (runs regardless of individual job outcomes)
+  # =====================================================================
+  notify:
+    needs: [check_format, static_analysis, build_debug, build_release]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_APP_PASSWORD }}
+          subject: "[${{ github.ref_name }}] CI/CD - ${{ job.status }}"
+          to: smaddu27@gmail.com
+          cc: 19mskumar@gmail.com
+          from: GitHub Actions <no-reply@github.com>
+          body: |
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          content_type: text/plain
