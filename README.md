@@ -2,7 +2,7 @@
 
 A complete, professional demonstration of modern CI/CD and V-Model SDLC practices, built around a real C++-to-C conversion of a banking system application. This project began as a CI/CD learning exercise and grew into a full reference implementation covering requirements engineering, design, modular C development, automated testing, static analysis, and release automation.
 
-[![Banking System CI/CD](https://github.com/mskumar18/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/mskumar18/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml)
+[![Banking System CI/CD](https://github.com/embedderr/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/embedderr/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml)
 
 ---
 
