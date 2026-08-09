@@ -86,11 +86,11 @@ jobs:
           path: reports/
 
   # =====================================================================
-  # Job 3: Build (Debug) + Unit Tests + Coverage
+  # Job 3: Build (Debug) only
   # =====================================================================
   build_debug:
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -101,18 +101,6 @@ jobs:
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-python-pip
-
-      - name: Install gcovr
-        run: |
-          choco install llvm -y
-          python -m pip install gcovr
-        shell: powershell
-
-      - name: Prepare Directories
-        run: mkdir -Force reports\code_coverage, release
-        shell: powershell
 
       - name: Build (Debug)
         run: |
@@ -122,15 +110,78 @@ jobs:
         timeout-minutes: 10
         shell: cmd
 
+      - name: Upload Debug Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-build
+          path: build/
+
+  # =====================================================================
+  # Job 4: Unit Tests (depends on build_debug)
+  # =====================================================================
+  unit_tests:
+    needs: build_debug
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Debug Build
+        uses: actions/download-artifact@v4
+        with:
+          name: debug-build
+          path: build
+
+      - name: Setup MSYS2 (for runtime libs if needed)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: mingw-w64-x86_64-gcc
+
       - name: Run Unit Tests
         run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
           cd build
           ctest --output-on-failure
         timeout-minutes: 8
         shell: cmd
 
-      - name: Run Program & Coverage
+  # =====================================================================
+  # Job 5: Coverage Report (depends on build_debug)
+  # =====================================================================
+  coverage:
+    needs: build_debug
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Debug Build
+        uses: actions/download-artifact@v4
+        with:
+          name: debug-build
+          path: build
+
+      - name: Setup MSYS2 + Python
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
+
+      - name: Install gcovr
+        run: python -m pip install gcovr
+        shell: powershell
+
+      - name: Prepare Directories
+        run: mkdir -Force reports\code_coverage
+        shell: powershell
+
+      - name: Run Program & Generate Coverage
         run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
           echo "=== Running Banking System ==="
           echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
 
@@ -141,9 +192,38 @@ jobs:
         timeout-minutes: 6
         shell: cmd
 
-      - name: Create Release Artifacts (Debug)
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: reports/code_coverage/
+
+  # =====================================================================
+  # Job 6: Create Release Artifacts (from Debug build)
+  # =====================================================================
+  create_release_artifacts:
+    needs: build_debug
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Debug Build
+        uses: actions/download-artifact@v4
+        with:
+          name: debug-build
+          path: build
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: mingw-w64-x86_64-gcc
+
+      - name: Create Release Artifacts
         run: |
           set PATH=C:\msys64\mingw64\bin;%PATH%
+          mkdir release
           copy build\banking_system.exe release\banking_system.exe
           copy build\test_address.exe release\test_address.exe
           copy build\test_admin.exe release\test_admin.exe
@@ -163,18 +243,14 @@ jobs:
           objcopy -O binary build\test_ui_screens_internal.exe release\test_ui_screens_internal.bin 2>nul
         shell: cmd
 
-      - name: Upload Debug Build Reports and Release Artifacts
+      - name: Upload Release Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: reports-coverage-and-release
-          path: |
-            reports/code_coverage/
-            release/
+          name: release-artifacts
+          path: release/
 
   # =====================================================================
-  # Job 4: Build (Release) — compile-only check, closes the Debug/Release
-  # matrix item on the roadmap. No tests/coverage here: Release strips
-  # debug info and doesn't use --coverage flags.
+  # Job 7: Build (Release) — compile-only
   # =====================================================================
   build_release:
     runs-on: windows-latest
@@ -199,11 +275,10 @@ jobs:
         shell: cmd
 
   # =====================================================================
-  # Job 5: Collect everything into one combined artifact, matching the
-  # existing "all-reports-and-release" name so nothing downstream breaks.
+  # Job 8: Collect everything
   # =====================================================================
   collect_artifacts:
-    needs: [check_format, static_analysis, build_debug, build_release]
+    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release]
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
@@ -213,11 +288,17 @@ jobs:
           name: reports-static-analysis
           path: combined/reports
 
-      - name: Download coverage report + release artifacts
+      - name: Download coverage report
         uses: actions/download-artifact@v4
         with:
-          name: reports-coverage-and-release
-          path: combined
+          name: coverage-report
+          path: combined/reports/code_coverage
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: combined/release
 
       - name: Upload combined artifact
         uses: actions/upload-artifact@v4
@@ -228,7 +309,7 @@ jobs:
             combined/release
 
   # =====================================================================
-  # Job 6: Publish reports to GitHub Pages (main branch only)
+  # Job 9: Deploy to GitHub Pages (main only)
   # =====================================================================
   deploy_pages:
     needs: collect_artifacts
@@ -261,10 +342,10 @@ jobs:
         uses: actions/deploy-pages@v4
 
   # =====================================================================
-  # Job 7: Notification (runs regardless of individual job outcomes)
+  # Job 10: Notification
   # =====================================================================
   notify:
-    needs: [check_format, static_analysis, build_debug, build_release]
+    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
