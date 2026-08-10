@@ -224,7 +224,7 @@ jobs:
           msystem: MINGW64
           install: mingw-w64-x86_64-gcc
 
-      - name: Create Release Artifacts
+      - name: Create Release Artifacts & Generate Checksums
         run: |
           set PATH=C:\msys64\mingw64\bin;%PATH%
           mkdir release
@@ -245,6 +245,11 @@ jobs:
           objcopy -O binary build\test_cash_queue.exe release\test_cash_queue.bin 2>nul
           objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
           objcopy -O binary build\test_ui_screens_internal.exe release\test_ui_screens_internal.bin 2>nul
+
+          echo === Generating SHA-256 Checksums ===
+          cd release
+          powershell -Command "Get-ChildItem -File | Get-FileHash -Algorithm SHA256 | Format-Table -AutoSize Hash, Path" > checksums.txt
+          type checksums.txt
         shell: cmd
 
       - name: Upload Release Artifacts
