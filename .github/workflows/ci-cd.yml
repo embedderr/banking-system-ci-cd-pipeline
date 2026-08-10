@@ -494,7 +494,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: all-reports-and-release
-          path: .  # Download to current directory so combined/reports/ aligns
+          path: .
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -502,12 +502,11 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: combined/reports/
+          path: reports/  # <-- CHANGE THIS FROM combined/reports/ TO reports/
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
   # =====================================================================
   # Job 11: Notification
   # =====================================================================
