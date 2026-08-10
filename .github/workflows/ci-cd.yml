@@ -416,6 +416,16 @@ jobs:
                   <span>Generated: $(date -u +"%Y-%m-%d %H:%M UTC")</span>
                 </div>
               </header>
+              
+
+              <div class="info-box">
+                <strong>Version / Changelog:</strong>
+                <a href="https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md">View CHANGELOG.md</a>
+                &nbsp;|&nbsp;
+                <strong>License:</strong> MIT (pending)
+                &nbsp;|&nbsp;
+                <strong>Authors:</strong> Banking System Team
+              </div>
 
               <div class="grid">
                 <div class="card">
