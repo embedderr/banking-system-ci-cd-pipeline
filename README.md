@@ -3,6 +3,10 @@
 A complete, professional demonstration of modern CI/CD and V-Model SDLC practices, built around a real C++-to-C conversion of a banking system application. This project began as a CI/CD learning exercise and grew into a full reference implementation covering requirements engineering, design, modular C development, automated testing, static analysis, and release automation.
 
 [![Banking System CI/CD](https://github.com/embedderr/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/embedderr/banking-system-ci-cd-pipeline/actions/workflows/ci-cd.yml)
+[![GitHub Pages](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://embedderr.github.io/banking-system-ci-cd-pipeline/)
+[![Doxygen](https://img.shields.io/badge/Docs-Doxygen-orange)](https://embedderr.github.io/banking-system-ci-cd-pipeline/doxygen/)
+[![Coverage](https://img.shields.io/badge/Coverage-gcovr-green)](https://embedderr.github.io/banking-system-ci-cd-pipeline/code_coverage/coverage.html)
+[![MISRA](https://img.shields.io/badge/MISRA-C-blueviolet)](https://embedderr.github.io/banking-system-ci-cd-pipeline/misra_check/)
 
 ---
 
