@@ -102,10 +102,10 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
 
-      - name: Build (Debug)
+      - name: Build (Debug with Coverage Flags)
         run: |
           set PATH=C:\msys64\mingw64\bin;%PATH%
-          cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
+          cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage"
           cmake --build build
         timeout-minutes: 10
         shell: cmd
@@ -179,18 +179,22 @@ jobs:
         run: mkdir -Force reports\code_coverage
         shell: powershell
 
-      - name: Run Program & Generate Coverage
+      - name: Execute Tests & Generate Coverage Report
         run: |
           set PATH=C:\msys64\mingw64\bin;%PATH%
-          echo "=== Running Banking System ==="
+          
+          echo "=== Executing Unit Tests ==="
+          cd build
+          ctest --output-on-failure
+          cd ..
+
+          echo "=== Running Main Application ==="
           echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
 
           echo "=== Generating Coverage Report ==="
-          gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
-
-          type program_output.txt
+          gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" -e "build/deps/*" -e "tests/*" || echo "gcovr failed"
         timeout-minutes: 10
-        shell: cmd
+        shell: cmd      
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
@@ -490,7 +494,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: all-reports-and-release
-          path: combined
+          path: .  # Download to current directory so combined/reports/ aligns
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -498,7 +502,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: combined/reports
+          path: combined/reports/
 
       - name: Deploy to GitHub Pages
         id: deployment
@@ -508,11 +512,20 @@ jobs:
   # Job 11: Notification
   # =====================================================================
   notify:
-    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release, build_doxygen]
+    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release, build_doxygen, deploy_pages]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Determine overall pipeline status
+        id: pipeline_status
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+          else
+            echo "status=SUCCESS" >> $GITHUB_OUTPUT
+          fi
+
       - name: Send Notification
         uses: dawidd6/action-send-mail@v3
         with:
@@ -520,11 +533,12 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_APP_PASSWORD }}
-          subject: "[${{ github.ref_name }}] CI/CD - ${{ job.status }}"
+          subject: "[${{ github.ref_name }}] CI/CD Pipeline - ${{ steps.pipeline_status.outputs.status }}"
           to: smaddu27@gmail.com
           cc: 19mskumar@gmail.com
           from: GitHub Actions <no-reply@github.com>
           body: |
+            Pipeline Status: ${{ steps.pipeline_status.outputs.status }}
             Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
             Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
