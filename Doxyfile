@@ -1,0 +1,30 @@
+PROJECT_NAME           = "Banking System"
+PROJECT_BRIEF          = "Banking System - API Documentation"
+OUTPUT_DIRECTORY       = reports/doxygen
+CREATE_SUBDIRS         = NO
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+
+INPUT                  = src include
+RECURSIVE              = YES
+EXCLUDE                = build tests release docs
+FILE_PATTERNS          = *.c *.h
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DOT_IMAGE_FORMAT       = png
+MAX_DOT_GRAPH_DEPTH    = 3
+
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = YES

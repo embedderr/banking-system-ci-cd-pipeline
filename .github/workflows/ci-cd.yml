@@ -274,11 +274,35 @@ jobs:
         timeout-minutes: 10
         shell: cmd
 
+
   # =====================================================================
-  # Job 8: Collect everything
+  # Job 8: Generate Doxygen Documentation
+  # =====================================================================
+  build_doxygen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Doxygen + Graphviz
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+      - name: Generate Doxygen Documentation
+        run: doxygen Doxyfile
+
+      - name: Upload Doxygen Docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-docs
+          path: reports/doxygen/html
+
+
+
+  # =====================================================================
+  # Job 9: Collect everything
   # =====================================================================
   collect_artifacts:
-    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release]
+    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release, build_doxygen]
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
@@ -300,6 +324,42 @@ jobs:
           name: release-artifacts
           path: combined/release
 
+      - name: Download Doxygen docs
+        uses: actions/download-artifact@v4
+        with:
+          name: doxygen-docs
+          path: combined/reports/doxygen    
+
+      - name: Generate reports landing page
+        shell: bash
+        run: |
+          cat > combined/reports/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Banking System - CI/CD Reports</title>
+            <style>
+              body { font-family: sans-serif; max-width: 700px; margin: 60px auto; }
+              h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+              ul { line-height: 2; }
+              a { text-decoration: none; color: #0366d6; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>Banking System - CI/CD Reports</h1>
+            <p>Generated automatically on every push to <code>main</code>.</p>
+            <ul>
+              <li><a href="static_code_check/index.html">Static Code Analysis (cppcheck)</a></li>
+              <li><a href="misra_check/index.html">MISRA C Compliance</a></li>
+              <li><a href="code_coverage/coverage.html">Code Coverage (gcov/gcovr)</a></li>
+              <li><a href="doxygen/index.html">API Documentation (Doxygen)</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF    
+
       - name: Upload combined artifact
         uses: actions/upload-artifact@v4
         with:
@@ -308,8 +368,10 @@ jobs:
             combined/reports
             combined/release
 
+            
+
   # =====================================================================
-  # Job 9: Deploy to GitHub Pages (main only)
+  # Job 10: Deploy to GitHub Pages (main only)
   # =====================================================================
   deploy_pages:
     needs: collect_artifacts
@@ -342,10 +404,10 @@ jobs:
         uses: actions/deploy-pages@v4
 
   # =====================================================================
-  # Job 10: Notification
+  # Job 11: Notification
   # =====================================================================
   notify:
-    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release]
+    needs: [check_format, static_analysis, build_debug, unit_tests, coverage, create_release_artifacts, build_release, build_doxygen]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
