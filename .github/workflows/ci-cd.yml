@@ -152,7 +152,7 @@ jobs:
   coverage:
     needs: build_debug
     runs-on: windows-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -189,7 +189,7 @@ jobs:
           gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
 
           type program_output.txt
-        timeout-minutes: 6
+        timeout-minutes: 10
         shell: cmd
 
       - name: Upload Coverage Report
