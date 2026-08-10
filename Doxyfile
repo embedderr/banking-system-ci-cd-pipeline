@@ -1,30 +1,96 @@
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
 PROJECT_NAME           = "Banking System"
+PROJECT_NUMBER         =
 PROJECT_BRIEF          = "Banking System - API Documentation"
+PROJECT_LOGO           =
+
 OUTPUT_DIRECTORY       = reports/doxygen
 CREATE_SUBDIRS         = NO
+ALLOW_UNICODE_NAMES    = NO
 
+#---------------------------------------------------------------------------
+# Build
+#---------------------------------------------------------------------------
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
 
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
 INPUT                  = src include
+INPUT_ENCODING         = UTF-8
+FILE_PATTERNS          = *.c *.h
 RECURSIVE              = YES
 EXCLUDE                = build tests release docs
-FILE_PATTERNS          = *.c *.h
+EXCLUDE_PATTERNS       = */build/* */tests/* */release/*
 
+#---------------------------------------------------------------------------
+# Source Browser
+#---------------------------------------------------------------------------
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+REFERENCES_LINK_SOURCE = YES
+
+#---------------------------------------------------------------------------
+# HTML Output
+#---------------------------------------------------------------------------
 GENERATE_HTML          = YES
-GENERATE_LATEX         = NO
 HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
 HTML_COLORSTYLE_GAMMA  = 80
+HTML_TIMESTAMP         = YES
 
+#---------------------------------------------------------------------------
+# Graphs (requires Graphviz)
+#---------------------------------------------------------------------------
 HAVE_DOT               = YES
+DOT_NUM_THREADS        = 0
+DOT_IMAGE_FORMAT       = png
+INTERACTIVE_SVG        = NO
+CLASS_DIAGRAMS         = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
 CALL_GRAPH             = YES
 CALLER_GRAPH           = YES
-DOT_IMAGE_FORMAT       = png
+GRAPHICAL_HIERARCHY    = YES
+DIRECTORY_GRAPH        = YES
+DOT_GRAPH_MAX_NODES    = 50
 MAX_DOT_GRAPH_DEPTH    = 3
+DOT_TRANSPARENT        = NO
+DOT_MULTI_TARGETS      = YES
 
+#---------------------------------------------------------------------------
+# Warnings
+#---------------------------------------------------------------------------
 QUIET                  = YES
+WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+
+#---------------------------------------------------------------------------
+# Other
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+GENERATE_XML           = NO
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+SEARCH_INCLUDES        = YES
