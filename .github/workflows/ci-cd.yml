@@ -90,7 +90,7 @@ jobs:
   # =====================================================================
   build_debug:
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
