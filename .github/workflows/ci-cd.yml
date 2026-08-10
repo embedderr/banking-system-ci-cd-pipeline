@@ -6,9 +6,9 @@ concurrency:
 
 on:
   push:
-    branches: [ main, develop, 'release/*', 'feat/*' ]
+    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*' ]
   pull_request:
-    branches: [ main, develop, 'release/*', 'feat/*' ]
+    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*' ]
 
 permissions:
   contents: read
@@ -375,7 +375,7 @@ jobs:
   # =====================================================================
   deploy_pages:
     needs: collect_artifacts
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/doxygen_github_pages'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
