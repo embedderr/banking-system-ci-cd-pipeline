@@ -24,12 +24,13 @@ HIDE_UNDOC_CLASSES     = NO
 #---------------------------------------------------------------------------
 # Input
 #---------------------------------------------------------------------------
-INPUT                  = src include
+INPUT                  = src include mainpage.md
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c *.h
 RECURSIVE              = YES
 EXCLUDE                = build tests release docs
 EXCLUDE_PATTERNS       = */build/* */tests/* */release/*
+USE_MDFILE_AS_MAINPAGE = mainpage.md
 
 #---------------------------------------------------------------------------
 # Source Browser
