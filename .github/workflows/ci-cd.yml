@@ -192,7 +192,7 @@ jobs:
           echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
 
           echo "=== Generating Coverage Report ==="
-          gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" -e "build/deps/*" -e "tests/*" || echo "gcovr failed"
+          gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" -e "build/*" || echo "gcovr failed"
         timeout-minutes: 10
         shell: cmd      
 
