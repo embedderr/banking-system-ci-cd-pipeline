@@ -23,7 +23,7 @@ set includes=-I./include
 set platfrm=win64
 
 echo [1/3] Running Static Analysis...
-cppcheck --xml --enable=all --clang --std=c99 %includes% --platform=%platfrm% %files% --output-file=reports\static_code_check\static_file.xml
+cppcheck --xml --enable=all --std=c99 %includes% --platform=%platfrm% %files% --output-file=reports\static_code_check\static_file.xml
 
 echo [2/3] Running MISRA Check...
 cppcheck --xml --enable=all --std=c99 %includes% --platform=%platfrm% --addon=./static_code_analysis/misra-config.json %files% --output-file=reports\misra_check\MISRA_file.xml
