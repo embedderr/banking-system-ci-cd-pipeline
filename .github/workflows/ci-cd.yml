@@ -40,29 +40,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Install cppcheck (official release, avoids broken choco FILESDIR)
-      #   shell: pwsh
-      #   run: |
-      #     $version = "2.14.2"
-      #     $url = "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
-      #     Invoke-WebRequest -Uri $url -OutFile cppcheck.msi
-      #     Start-Process msiexec.exe -ArgumentList "/i cppcheck.msi /quiet /norestart" -Wait
-      #     echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Append
+      - name: Install cppcheck (official release, avoids broken choco FILESDIR)
+        shell: pwsh
+        run: |
+          $version = "2.14.2"
+          $url = "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
+          Invoke-WebRequest -Uri $url -OutFile cppcheck.msi
+          Start-Process msiexec.exe -ArgumentList "/i cppcheck.msi /quiet /norestart" -Wait
+          echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Append
 
-      #     $srcZipUrl = "https://github.com/danmar/cppcheck/archive/refs/tags/$version.zip"
-      #     Invoke-WebRequest -Uri $srcZipUrl -OutFile cppcheck-src.zip
-      #     Expand-Archive -Path cppcheck-src.zip -DestinationPath cppcheck-src -Force
-      #     robocopy "cppcheck-src\cppcheck-$version\addons" "C:\Program Files\Cppcheck\addons" /E /IS /IT
-      #     if ($LASTEXITCODE -ge 8) { exit 1 } else { $global:LASTEXITCODE = 0 }
+          $srcZipUrl = "https://github.com/danmar/cppcheck/archive/refs/tags/$version.zip"
+          Invoke-WebRequest -Uri $srcZipUrl -OutFile cppcheck-src.zip
+          Expand-Archive -Path cppcheck-src.zip -DestinationPath cppcheck-src -Force
+          robocopy "cppcheck-src\cppcheck-$version\addons" "C:\Program Files\Cppcheck\addons" /E /IS /IT
+          if ($LASTEXITCODE -ge 8) { exit 1 } else { $global:LASTEXITCODE = 0 }
 
 
       # Install LLVM toolchain (provides clang-tidy.exe)
 
-      - name: Install Cppcheck and LLVM
-        run: |
-          choco install cppcheck llvm -y
-          echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-        shell: powershell    
+      # - name: Install Cppcheck and LLVM
+      #   run: |
+      #     choco install cppcheck llvm -y
+      #     echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+      #   shell: powershell    
 
       - name: Verify cppcheck and addons
         run: |
@@ -75,10 +75,10 @@ jobs:
 
         
 
-      # Generate compilation database using runner's built-in CMake
-      - name: Generate Compile Commands JSON
-        run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-        shell: cmd
+      # # Generate compilation database using runner's built-in CMake
+      # - name: Generate Compile Commands JSON
+      #   run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      #   shell: cmd
 
       # ===========================================  
 
