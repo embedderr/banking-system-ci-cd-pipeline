@@ -62,6 +62,27 @@ jobs:
         shell: cmd
 
 
+      # ========== ADDED FOR CLANG-TIDY ==========
+      - name: Install LLVM (for clang-tidy)
+        run: choco install llvm -y
+        shell: powershell
+
+      - name: Setup MSYS2 (for CMake compile_commands.json)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+
+      - name: Generate Compile Commands JSON
+        run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
+          cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        shell: cmd
+      # ===========================================  
+
+
       # ========== ADD THIS STEP ==========
       - name: Install Python dependencies for HTML reports
         run: |
