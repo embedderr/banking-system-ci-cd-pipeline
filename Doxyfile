@@ -1,0 +1,56 @@
+#---------------------------------------------------------------------------
+# Doxyfile for Banking System (C)
+#
+# This is a minimal, curated config -- every key not explicitly set here
+# falls back to Doxygen's built-in default. Generated with:
+#   doxygen Doxyfile
+# from the repository root. Output lands in reports/doxygen/html, matching
+# the layout the CI pipeline expects when publishing to GitHub Pages.
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "Banking System"
+PROJECT_BRIEF          = "A modular, portable C banking system -- converted from a C++ prototype, built with a full V-Model SDLC"
+OUTPUT_LANGUAGE        = English
+
+# ---- Input ----
+INPUT                  = src include
+FILE_PATTERNS          = *.c *.h
+RECURSIVE               = NO
+EXCLUDE_PATTERNS        = */ui_screens_internal.h
+
+# ---- Output ----
+OUTPUT_DIRECTORY       = reports/doxygen
+GENERATE_HTML           = YES
+HTML_OUTPUT              = html
+GENERATE_LATEX          = NO
+GENERATE_MAN             = NO
+GENERATE_RTF             = NO
+
+# ---- Extraction behavior ----
+EXTRACT_ALL             = YES
+EXTRACT_STATIC          = YES
+EXTRACT_PRIVATE         = YES
+OPTIMIZE_OUTPUT_FOR_C   = YES
+TYPEDEF_HIDES_STRUCT    = YES
+
+# ---- Source browsing ----
+SOURCE_BROWSER          = YES
+INLINE_SOURCES          = NO
+REFERENCED_BY_RELATION  = YES
+REFERENCES_RELATION     = YES
+
+# ---- Diagrams (kept off: no Graphviz dependency needed in CI) ----
+HAVE_DOT                = NO
+CLASS_DIAGRAMS          = NO
+
+# ---- Warnings ----
+QUIET                   = YES
+WARNINGS                = YES
+WARN_IF_UNDOCUMENTED    = YES
+WARN_IF_DOC_ERROR       = YES
+WARN_NO_PARAMDOC        = YES
+
+# ---- Misc ----
+TAB_SIZE                = 4
+SORT_MEMBER_DOCS        = YES
+GENERATE_TREEVIEW       = YES

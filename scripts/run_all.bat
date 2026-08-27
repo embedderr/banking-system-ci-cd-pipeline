@@ -1,89 +1,58 @@
-@echo off
-echo ================================================
-echo     Banking System - Full CI/CD Pipeline
-echo ================================================
+#!/usr/bin/env bash
+#
+# Linux/Codespaces equivalent of scripts/run_all.bat.
+#
+# Note on scope: this script intentionally does NOT run the MISRA check.
+# The apt-installed cppcheck package on Linux is not guaranteed to ship
+# with the misra.py addon the way the official Windows MSI release does
+# (see ci-cd.yml's static_analysis job, which explicitly re-syncs the
+# addons folder from the matching source release for exactly this
+# reason). Plain static analysis (no MISRA) is still run here as a
+# best-effort local check; the authoritative static analysis + MISRA
+# result for this project remains the Windows CI job.
 
-cd /d "%~dp0\.."
+set -e
 
-set "PYCMD="
-for /f "delims=" %%P in ('where python 2^>nul') do (
-    echo %%P | findstr /i "msys64" >nul
-    if errorlevel 1 (
-        if not defined PYCMD set "PYCMD=%%P"
-    )
-)
-if not defined PYCMD set "PYCMD=python"
+cd "$(dirname "$0")/.."
 
-echo [0/9] Checking Requirements...
-call scripts\requirements.bat
+echo "================================================"
+echo "    Banking System - Full Pipeline (Linux/Codespaces)"
+echo "================================================"
 
-echo [1/9] Cleaning previous outputs...
-rd /s /q build reports release 2>nul
-mkdir reports\static_code_check reports\misra_check reports\code_coverage
-mkdir release
+echo "[1/7] Cleaning previous outputs..."
+rm -rf build reports release
+mkdir -p reports/code_coverage reports/static_code_check release
 
-echo [2/9] Code Formatting Check...
-clang-format -i src/*.c include/*.h
-if errorlevel 1 (
-    echo [WARNING] Code formatting check encountered an error.
-) else (
-    echo Formatting check passed
-)
+echo "[2/7] Code Formatting Check..."
+clang-format --dry-run --Werror src/*.c include/*.h || echo "[WARNING] Formatting issues found (see above)"
 
-echo [3/9] Static Analysis + MISRA...
-call scripts\static_code_analysis.bat
+echo "[3/7] Static Analysis (best-effort, no MISRA -- see script header)..."
+cppcheck --xml --enable=all --std=c99 -I./include --platform=unix64 ./src \
+  --output-file=reports/static_code_check/static_file.xml || echo "[WARNING] cppcheck reported issues"
 
-echo [4/9] Building Project...
-set PATH=C:\msys64\mingw64\bin;%PATH%
-cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
+echo "[4/7] Building Project (Debug)..."
+cmake -B build -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 
-echo [5/9] Running Unit Tests...
-cd build
-ctest --output-on-failure
-cd ..
+echo "[5/7] Running Unit Tests..."
+(cd build && ctest --output-on-failure)
 
-echo [6/9] Running Main Program...
-build\banking_system.exe
+echo "[6/7] Running Main Program (smoke test, piped empty input)..."
+echo | timeout 5 ./build/banking_system || echo "Program exited (expected on closed stdin)"
 
-echo [7/9] Generating Code Coverage Report...
-%PYCMD% -m gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System - Code Coverage"
+echo "[7/7] Generating Code Coverage Report..."
+gcovr -r . --html-nested reports/code_coverage/coverage.html --html-title="Banking System Coverage" || echo "[WARNING] gcovr failed"
 
-echo [8/9] Creating Release Artifacts for QA...
-copy build\banking_system.exe release\banking_system.exe
-copy build\test_address.exe release\test_address.exe
-copy build\test_admin.exe release\test_admin.exe
-copy build\test_bill_queue.exe release\test_bill_queue.exe
-copy build\test_cash_queue.exe release\test_cash_queue.exe
-copy build\test_account.exe release\test_account.exe
+echo "Creating Release Artifacts..."
+cp build/banking_system release/banking_system
+for f in build/test_*; do
+  [ -f "$f" ] && [ -x "$f" ] && cp "$f" release/
+done
 
-:: Copy object files from build
-copy build\CMakeFiles\banking_system.dir\src\*.obj release\ 2>nul
-copy build\CMakeFiles\test_address.dir\tests\*.obj release\ 2>nul
-copy build\CMakeFiles\test_address.dir\src\*.obj release\ 2>nul
-copy build\CMakeFiles\test_admin.dir\tests\*.obj release\ 2>nul
-copy build\CMakeFiles\test_admin.dir\src\*.obj release\ 2>nul
-copy build\CMakeFiles\test_bill_queue.dir\tests\*.obj release\ 2>nul
-copy build\CMakeFiles\test_bill_queue.dir\src\*.obj release\ 2>nul
-copy build\CMakeFiles\test_cash_queue.dir\tests\*.obj release\ 2>nul
-copy build\CMakeFiles\test_cash_queue.dir\src\*.obj release\ 2>nul
-copy build\CMakeFiles\test_account.dir\tests\*.obj release\ 2>nul
-copy build\CMakeFiles\test_account.dir\src\*.obj release\ 2>nul
-
-:: Create .bin files (binary images)
-objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
-objcopy -O binary build\test_address.exe release\test_address.bin 2>nul
-objcopy -O binary build\test_admin.exe release\test_admin.bin 2>nul
-objcopy -O binary build\test_bill_queue.exe release\test_bill_queue.bin 2>nul
-objcopy -O binary build\test_cash_queue.exe release\test_cash_queue.bin 2>nul
-objcopy -O binary build\test_account.exe release\test_account.bin 2>nul
-
-echo [9/9] Pipeline Completed Successfully!
-echo.
-echo ================================================
-echo Reports and Artifacts Ready:
-echo   - Static Analysis : reports\static_code_check\index.html
-echo   - MISRA           : reports\misra_check\index.html
-echo   - Code Coverage   : reports\code_coverage\coverage.html
-echo   - QA Artifacts    : release/ folder (.exe, .o, .bin)
-echo ================================================
+echo ""
+echo "================================================"
+echo "Pipeline complete."
+echo "  - Static analysis : reports/static_code_check/static_file.xml"
+echo "  - Coverage         : reports/code_coverage/coverage.html"
+echo "  - Artifacts        : release/"
+echo "================================================"
