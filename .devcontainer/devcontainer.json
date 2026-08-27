@@ -1,0 +1,30 @@
+{
+  "name": "Banking System C Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu-22.04",
+
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
+  },
+
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y cppcheck clang-format doxygen && pip3 install --user gcovr && chmod +x scripts/*.sh 2>/dev/null || true",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "xaver.clang-format",
+        "cschlosser.doxdocgen",
+        "streetsidesoftware.code-spell-checker"
+      ],
+      "settings": {
+        "C_Cpp.default.cStandard": "c99",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "remoteUser": "vscode"
+}
