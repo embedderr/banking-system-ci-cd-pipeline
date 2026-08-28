@@ -6,9 +6,9 @@ concurrency:
 
 on:
   push:
-    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*' ]
+    branches: [ main, develop, 'release/*' ]
   pull_request:
-    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*' ]
+    branches: [ main, develop, 'release/*' ]
 
 permissions:
   contents: read
@@ -59,6 +59,16 @@ jobs:
         run: |
           cppcheck --version
           dir "C:\Program Files\Cppcheck\addons\misra.py"
+        shell: cmd
+
+      # NOTE: cppcheck-htmlreport requires 'pygments' to render syntax-
+      # highlighted HTML. In the previous single-job pipeline this was
+      # present only by accident, as a transitive dependency pulled in
+      # by 'pip install gcovr' in an unrelated later step. Now that this
+      # job runs independently, it must install its own dependency
+      # explicitly rather than relying on that side effect.
+      - name: Install Python dependencies for HTML report generation
+        run: python -m pip install pygments
         shell: cmd
 
       - name: Prepare Directories
