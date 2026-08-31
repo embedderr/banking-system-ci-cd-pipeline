@@ -299,7 +299,7 @@ jobs:
   # =====================================================================
   deploy_pages:
     needs: collect_artifacts
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work-from-v9.4.4'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
