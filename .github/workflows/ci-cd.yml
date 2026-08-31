@@ -19,7 +19,7 @@ jobs:
   # =====================================================================
   check_format:
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 11
     steps:
       - uses: actions/checkout@v4
 
