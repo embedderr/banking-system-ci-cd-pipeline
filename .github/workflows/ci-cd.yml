@@ -6,9 +6,9 @@ concurrency:
 
 on:
   push:
-    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*', work-from-v9.4.4 ]
+    branches: [ main, develop, 'release/*' ]
   pull_request:
-    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*', work-from-v9.4.4 ]
+    branches: [ main, develop, 'release/*' ]
 
 permissions:
   contents: read
