@@ -9,15 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 """
 
 body = """
-{% if version %}
-{% if timestamp %}
-## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
-{% else %}
-## [{{ version }}]
-{% endif %}
-{% else %}
+{% if version -%}
+## [{{ version }}] - {{ timestamp | default(value=0) | date(format="%Y-%m-%d") }}
+{% else -%}
 ## [unreleased]
-{% endif %}
+{% endif -%}
 
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
@@ -28,13 +24,10 @@ body = """
 """
 
 trim = true
-render_always = true
 
 [git]
 conventional_commits = true
 filter_unconventional = true
-skip_tags = ""
-ignore_tags = ""
 
 [[git.commit_parsers]]
 message = "^feat"
