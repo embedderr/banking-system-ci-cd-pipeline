@@ -78,11 +78,23 @@ jobs:
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Keep the freshly generated changelog safe
+        cp CHANGELOG.md /tmp/CHANGELOG.md.new
+
         git fetch origin ${TARGET_BRANCH}
         git checkout ${TARGET_BRANCH}
+
+        # Bring the new changelog onto the target branch
+        cp /tmp/CHANGELOG.md.new CHANGELOG.md
+
         git add CHANGELOG.md
-        git diff --cached --quiet || git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
-        git push origin ${TARGET_BRANCH}        
+        if git diff --cached --quiet; then
+          echo "No changes to CHANGELOG.md"
+        else
+          git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
+          git push origin ${TARGET_BRANCH}
+        fi        
         
     - name: Create Release
       uses: softprops/action-gh-release@v2
