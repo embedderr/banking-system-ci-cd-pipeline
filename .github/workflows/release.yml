@@ -51,13 +51,6 @@ jobs:
       env:
         VERSION: ${{ env.VERSION }}
 
-    - name: Generate Changelog
-      uses: orhun/git-cliff-action@v4
-      with:
-        config: cliff.toml
-      env:
-        OUTPUT: CHANGELOG.md
-
     - name: Determine target branch for changelog commit
       id: branch
       shell: bash
@@ -73,29 +66,32 @@ jobs:
         echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
         echo "Target branch resolved to: $TARGET_BRANCH"
 
-    - name: Commit and push updated CHANGELOG.md
+    - name: Checkout target branch
       shell: bash
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-
-        # Keep the freshly generated changelog safe
-        cp CHANGELOG.md /tmp/CHANGELOG.md.new
-
         git fetch origin ${TARGET_BRANCH}
         git checkout ${TARGET_BRANCH}
 
-        # Bring the new changelog onto the target branch
-        cp /tmp/CHANGELOG.md.new CHANGELOG.md
+    - name: Generate Changelog
+      uses: orhun/git-cliff-action@v4
+      with:
+        config: cliff.toml
+      env:
+        OUTPUT: CHANGELOG.md
 
+    - name: Commit and push updated CHANGELOG.md
+      shell: bash
+      run: |
         git add CHANGELOG.md
         if git diff --cached --quiet; then
           echo "No changes to CHANGELOG.md"
         else
           git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
           git push origin ${TARGET_BRANCH}
-        fi        
-        
+        fi
+
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
@@ -111,8 +107,6 @@ jobs:
         prerelease: ${{ contains(github.ref, 'rc') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    #reports/code_coverage/coverage.html    
 
     - name: Send Notification
       if: always()
