@@ -428,6 +428,7 @@ This project follows a full V-Model SDLC. All requirements, design, and test doc
 - [ ] Add a `LICENSE` file (currently missing — blocks legal reuse/contribution despite being public)
 - [ ] Add `CONTRIBUTING.md` with setup and PR guidelines
 
+
 ### Medium Impact
 - [ ] Make cppcheck actually fail the build on real findings (`--error-exitcode=1`, or scoped to `error` severity) rather than only informational reporting
 - [ ] Add caching (`actions/cache`) for MSYS2 packages, pip, and cppcheck install to speed up CI
