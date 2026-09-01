@@ -1,121 +1,202 @@
-name: Release
+name: Release Pipeline
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
-  release:
+  # =====================================================================
+  # Job 1: Build Release Binaries
+  # =====================================================================
+  build_release:
+    name: Build Release Binaries
     runs-on: windows-latest
-    permissions:
-      contents: write
-
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
+      target_branch: ${{ steps.resolve_branch.outputs.target_branch }}
+      is_prerelease: ${{ steps.resolve_branch.outputs.is_prerelease }}
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Setup MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+      - name: Extract Version
+        id: extract_version
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Extracted Version: ${VERSION}"
 
-    - name: Install Tools
-      run: |
-        choco install llvm -y
-        python -m pip install gcovr
-      shell: powershell
+      - name: Resolve Target Branch & Release Type
+        id: resolve_branch
+        shell: bash
+        run: |
+          RAW_VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ "$RAW_VERSION" == *"-rc"* ]]; then
+            BASE=${RAW_VERSION%%-rc*}
+            MAJOR_MINOR=$(echo "$BASE" | cut -d. -f1,2)
+            TARGET_BRANCH="release/$MAJOR_MINOR"
+            IS_PRERELEASE="true"
+          else
+            TARGET_BRANCH="main"
+            IS_PRERELEASE="false"
+          fi
+          echo "target_branch=$TARGET_BRANCH" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "Target branch resolved to: $TARGET_BRANCH"
 
-    - name: Extract Version
-      shell: bash
-      run: |
-        VERSION=${GITHUB_REF#refs/tags/}
-        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
 
-    - name: Build
-      run: |
-        set PATH=C:\msys64\mingw64\bin;%PATH%
-        cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
-      shell: cmd
+      - name: Build Release Project
+        run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
+          cmake -B build -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+        timeout-minutes: 10
+        shell: cmd
 
-    - name: Create Binary Files & Rename with Version
-      run: |
-        objcopy -O binary build\banking_system.exe build\banking_system_%VERSION%.bin
-        objcopy -O binary build\test_account.exe build\test_account_%VERSION%.bin
-        copy build\banking_system.exe build\banking_system_%VERSION%.exe
-        copy build\test_account.exe build\test_account_%VERSION%.exe
-      shell: cmd
-      env:
-        VERSION: ${{ env.VERSION }}
+      - name: Generate Binaries & Versioned Artifacts
+        shell: cmd
+        env:
+          VERSION: ${{ steps.extract_version.outputs.version }}
+        run: |
+          mkdir release_assets
+          objcopy -O binary build\banking_system.exe release_assets\banking_system_%VERSION%.bin 2>nul
+          objcopy -O binary build\test_account.exe release_assets\test_account_%VERSION%.bin 2>nul
+          copy build\banking_system.exe release_assets\banking_system_%VERSION%.exe
+          copy build\test_account.exe release_assets\test_account_%VERSION%.exe
 
-    - name: Generate Changelog
-      uses: orhun/git-cliff-action@v4
-      with:
-        config: cliff.toml
-      env:
-        OUTPUT: CHANGELOG.md
+      - name: Upload Built Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-release-assets
+          path: release_assets/
 
-    - name: Determine target branch for changelog commit
-      id: branch
-      shell: bash
-      run: |
-        RAW_VERSION=${GITHUB_REF#refs/tags/v}
-        if [[ "$RAW_VERSION" == *"-rc"* ]]; then
-          BASE=${RAW_VERSION%%-rc*}
-          MAJOR_MINOR=$(echo "$BASE" | cut -d. -f1,2)
-          TARGET_BRANCH="release/$MAJOR_MINOR"
-        else
-          TARGET_BRANCH="main"
-        fi
-        echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
-        echo "Target branch resolved to: $TARGET_BRANCH"
+  # =====================================================================
+  # Job 2: Generate Changelog & Update Repository
+  # =====================================================================
+  generate_changelog:
+    name: Generate & Sync Changelog
+    needs: build_release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      changelog_exists: ${{ steps.check_changelog.outputs.exists }}
+    steps:
+      - name: Checkout Code (Full History)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Commit and push updated CHANGELOG.md
-      shell: bash
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git fetch origin ${TARGET_BRANCH}
-        git checkout ${TARGET_BRANCH}
-        git add CHANGELOG.md
-        git diff --cached --quiet || git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
-        git push origin ${TARGET_BRANCH}        
-        
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          build/banking_system_${{ env.VERSION }}.exe
-          build/test_account_${{ env.VERSION }}.exe
-          build/banking_system_${{ env.VERSION }}.bin
-          build/test_account_${{ env.VERSION }}.bin
-          CHANGELOG.md
-        tag_name: ${{ github.ref }}
-        name: Banking System ${{ env.VERSION }}
-        generate_release_notes: true
-        prerelease: ${{ contains(github.ref, 'rc') }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate Changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+        env:
+          OUTPUT: CHANGELOG.md
 
-    #reports/code_coverage/coverage.html    
+      - name: Commit and Push Updated CHANGELOG.md
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ needs.build_release.outputs.target_branch }}
+          VERSION: ${{ needs.build_release.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin ${TARGET_BRANCH}
+          git checkout ${TARGET_BRANCH}
+          git add CHANGELOG.md
+          git diff --cached --quiet || git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
+          git push origin ${TARGET_BRANCH}
 
-    - name: Send Notification
-      if: always()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_APP_PASSWORD }}
-        subject: "Banking System Release ${{ github.ref }} - ${{ job.status }}"
-        to: 19mskumar@gmail.com
-        cc: smaddu27@gmail.com
-        from: GitHub Actions <no-reply@github.com>
-        body: |
-          Release Status: ${{ job.status }}
-          Version: ${{ github.ref }}
-          Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        content_type: text/plain
+      - name: Upload Changelog Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-changelog
+          path: CHANGELOG.md
+
+  # =====================================================================
+  # Job 3: Publish GitHub Release
+  # =====================================================================
+  publish_release:
+    name: Publish GitHub Release
+    needs: [build_release, generate_changelog]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download Compiled Assets
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-release-assets
+          path: release_assets
+
+      - name: Download Changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: release-changelog
+          path: .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release_assets/*
+            CHANGELOG.md
+          tag_name: ${{ github.ref }}
+          name: Banking System ${{ needs.build_release.outputs.version }}
+          generate_release_notes: true
+          prerelease: ${{ needs.build_release.outputs.is_prerelease == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # =====================================================================
+  # Job 4: Send Release Notification
+  # =====================================================================
+  notify:
+    name: Send Release Email Notification
+    needs: [build_release, generate_changelog, publish_release]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Determine Overall Status
+        id: release_status
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+          else
+            echo "status=SUCCESS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_APP_PASSWORD }}
+          subject: "[${{ github.ref_name }}] Banking System Release - ${{ steps.release_status.outputs.status }}"
+          to: 19mskumar@gmail.com
+          cc: smaddu27@gmail.com
+          from: GitHub Actions <no-reply@github.com>
+          body: |
+            Release Status: ${{ steps.release_status.outputs.status }}
+            Tag/Version: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          content_type: text/plain
