@@ -9,7 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 """
 
 body = """
-## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% if version -%}
+  {% if timestamp -%}
+    ## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+  {% else -%}
+    ## [{{ version }}]
+  {% endif -%}
+{% else -%}
+  ## [unreleased]
+{% endif -%}
+
 {% for commit in commits %}
 - {% if commit.breaking %}**BREAKING:** {% endif %}{% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message }}
 {% endfor %}
