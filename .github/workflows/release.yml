@@ -95,12 +95,11 @@ jobs:
     needs: build_release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    outputs:
-      changelog_exists: ${{ steps.check_changelog.outputs.exists }}
     steps:
-      - name: Checkout Code (Full History)
+      - name: Checkout Target Branch (Full History)
         uses: actions/checkout@v4
         with:
+          ref: ${{ needs.build_release.outputs.target_branch }}
           fetch-depth: 0
 
       - name: Generate Changelog
@@ -118,8 +117,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin ${TARGET_BRANCH}
-          git checkout ${TARGET_BRANCH}
           git add CHANGELOG.md
           git diff --cached --quiet || git commit -m "docs: update CHANGELOG.md for ${VERSION} [skip ci]"
           git push origin ${TARGET_BRANCH}
@@ -130,6 +127,7 @@ jobs:
           name: release-changelog
           path: CHANGELOG.md
 
+          
   # =====================================================================
   # Job 3: Publish GitHub Release
   # =====================================================================
