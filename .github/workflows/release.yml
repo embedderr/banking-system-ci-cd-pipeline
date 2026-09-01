@@ -106,6 +106,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
+          args: --latest
         env:
           OUTPUT: CHANGELOG.md
 
@@ -127,7 +128,7 @@ jobs:
           name: release-changelog
           path: CHANGELOG.md
 
-          
+
   # =====================================================================
   # Job 3: Publish GitHub Release
   # =====================================================================
