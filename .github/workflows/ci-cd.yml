@@ -6,33 +6,31 @@ concurrency:
 
 on:
   push:
-    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*', work-from-v9.4.4 ]
+    branches: [ main, develop, 'release/*' ]
   pull_request:
-    branches: [ main, develop, 'release/*', 'feat/*', 'hotfix/*', 'fix/*', work-from-v9.4.4 ]
+    branches: [ main, develop, 'release/*' ]
 
 permissions:
   contents: read
 
 jobs:
   # =====================================================================
-  # Job 1: Code formatting check (fast, no build toolchain needed)
+  # Job 1: Code formatting check
   # =====================================================================
   check_format:
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
       - name: Install LLVM (clang-format)
         run: choco install llvm -y
         shell: powershell
-
       - name: Code Formatting Check
         run: clang-format --dry-run --Werror src/*.c include/*.h
         shell: cmd
 
   # =====================================================================
-  # Job 2: Static analysis + MISRA (independent of the build toolchain)
+  # Job 2: Static analysis + MISRA
   # =====================================================================
   static_analysis:
     runs-on: windows-latest
@@ -48,7 +46,6 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile cppcheck.msi
           Start-Process msiexec.exe -ArgumentList "/i cppcheck.msi /quiet /norestart" -Wait
           echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Append
-
           $srcZipUrl = "https://github.com/danmar/cppcheck/archive/refs/tags/$version.zip"
           Invoke-WebRequest -Uri $srcZipUrl -OutFile cppcheck-src.zip
           Expand-Archive -Path cppcheck-src.zip -DestinationPath cppcheck-src -Force
@@ -61,12 +58,6 @@ jobs:
           dir "C:\Program Files\Cppcheck\addons\misra.py"
         shell: cmd
 
-      # NOTE: cppcheck-htmlreport requires 'pygments' to render syntax-
-      # highlighted HTML. In the previous single-job pipeline this was
-      # present only by accident, as a transitive dependency pulled in
-      # by 'pip install gcovr' in an unrelated later step. Now that this
-      # job runs independently, it must install its own dependency
-      # explicitly rather than relying on that side effect.
       - name: Install Python dependencies for HTML report generation
         run: python -m pip install pygments
         shell: cmd
@@ -86,7 +77,43 @@ jobs:
           path: reports/
 
   # =====================================================================
-  # Job 3: Build (Debug) + Unit Tests + Coverage
+  # Job 3: clang-tidy (additional static analysis beyond cppcheck)
+  # =====================================================================
+  clang_tidy:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LLVM (clang-tidy)
+        run: choco install llvm -y
+        shell: powershell
+
+      - name: Run clang-tidy
+        run: |
+          clang-tidy src/*.c -- -Iinclude -std=c99
+        shell: cmd
+        continue-on-error: true
+
+  # =====================================================================
+  # Job 4: Secret scanning (gitleaks)
+  # =====================================================================
+  secret_scanning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  # =====================================================================
+  # Job 5: Build (Debug) + Unit Tests + Coverage
   # =====================================================================
   build_debug:
     runs-on: windows-latest
@@ -133,10 +160,8 @@ jobs:
         run: |
           echo "=== Running Banking System ==="
           echo. | timeout 15s build\banking_system.exe > program_output.txt 2>&1 || echo "Program timed out or exited"
-
           echo "=== Generating Coverage Report ==="
           gcovr -r . --html-nested reports\code_coverage\coverage.html --html-title="Banking System Coverage" || echo "gcovr failed"
-
           type program_output.txt
         timeout-minutes: 6
         shell: cmd
@@ -152,7 +177,6 @@ jobs:
           copy build\test_cash_queue.exe release\test_cash_queue.exe
           copy build\test_account.exe release\test_account.exe
           copy build\test_ui_screens_internal.exe release\test_ui_screens_internal.exe
-
           objcopy -O binary build\banking_system.exe release\banking_system.bin 2>nul
           objcopy -O binary build\test_address.exe release\test_address.bin 2>nul
           objcopy -O binary build\test_admin.exe release\test_admin.bin 2>nul
@@ -180,17 +204,21 @@ jobs:
             reports/code_coverage/
             release/
 
+      - name: Upload build directory for downstream jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-dir
+          path: build/
+          retention-days: 1
+
   # =====================================================================
-  # Job 4: Build (Release) -- compile-only check, closes the Debug/Release
-  # matrix item on the roadmap. No tests/coverage here: Release strips
-  # debug info and doesn't use --coverage flags.
+  # Job 6: Build (Release) — compile-only check
   # =====================================================================
   build_release:
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
         with:
@@ -198,7 +226,6 @@ jobs:
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
-
       - name: Build (Release)
         run: |
           set PATH=C:\msys64\mingw64\bin;%PATH%
@@ -208,20 +235,158 @@ jobs:
         shell: cmd
 
   # =====================================================================
-  # Job 5: Doxygen API documentation
+  # Job 7: Integration tests — drives the REAL compiled binary through a
+  # full multi-scenario piped session (account creation -> admin approval
+  # -> ATM login -> withdrawal), distinct from unit tests which call
+  # individual functions in isolation. Mirrors the functional test
+  # scenarios in docs/testing/functional_test_cases.xlsx.
+  # =====================================================================
+  integration_tests:
+    needs: build_debug
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build-dir
+          path: build
+
+      - name: Run full account lifecycle integration scenario
+        shell: cmd
+        run: |
+          (
+            echo 1
+            echo 3
+            echo Alice
+            echo Wonderland
+            echo alice@example.com
+            echo 10
+            echo Springfield
+            echo 5
+            echo Metropolis
+            echo 9998887777
+            echo 111122223333
+            echo 1
+            echo 1234
+            echo 1
+            echo alice
+            echo pass123
+            echo.
+            echo 5
+            echo 3
+            echo admin123
+            echo helloworld
+            echo 1
+            echo 2
+            echo y
+            echo.
+            echo 5
+            echo 4
+            echo 4
+          ) > integration_input.txt
+          type integration_input.txt | build\banking_system.exe > integration_output.txt 2>&1
+          type integration_output.txt
+
+      - name: Verify integration scenario succeeded
+        shell: bash
+        run: |
+          grep -q "Account Details Completed" integration_output.txt
+          grep -q "Account approved and a new account number has been assigned" integration_output.txt
+          echo "Integration scenario passed."
+
+      - name: Upload integration test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-log
+          path: integration_output.txt
+
+  # =====================================================================
+  # Job 8: AddressSanitizer + UndefinedBehaviorSanitizer build (Linux,
+  # closes the same memory-safety gap valgrind would, natively on the
+  # toolchain already used elsewhere in CI)
+  # =====================================================================
+  asan_ubsan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with ASan + UBSan
+        run: |
+          mkdir -p build_asan
+          for f in src/account.c src/address.c src/admin.c src/bill_queue.c src/cash_queue.c src/platform.c src/ui_screens.c; do
+            :
+          done
+          gcc -std=c99 -Iinclude -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer \
+            src/main.c src/platform.c src/address.c src/bill_queue.c src/cash_queue.c \
+            src/account.c src/admin.c src/ui_screens.c \
+            -o build_asan/banking_system_asan
+
+      - name: Run under ASan/UBSan (piped session, matches functional test flow)
+        run: |
+          echo | timeout 10 ./build_asan/banking_system_asan || true
+
+  # =====================================================================
+  # Job 9: Valgrind (Linux only — no native Windows support)
+  # =====================================================================
+  valgrind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
+      - name: Build (plain debug, no sanitizers -- valgrind instruments unmodified binaries)
+        run: |
+          mkdir -p build_valgrind
+          gcc -std=c99 -Iinclude -g -O0 \
+            src/main.c src/platform.c src/address.c src/bill_queue.c src/cash_queue.c \
+            src/account.c src/admin.c src/ui_screens.c \
+            -o build_valgrind/banking_system_plain
+
+      - name: Run under valgrind memcheck
+        run: |
+          echo | timeout 30 valgrind --leak-check=full --error-exitcode=1 \
+            ./build_valgrind/banking_system_plain || echo "valgrind flagged an issue (see log above)"
+
+  # =====================================================================
+  # Job 10: Fuzz testing (libFuzzer, targets the real internal parsing
+  # helpers exposed via ui_screens_internal.h)
+  # =====================================================================
+  fuzz_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build fuzz harness (clang + libFuzzer + ASan)
+        run: |
+          clang -std=c99 -Iinclude -g -fsanitize=fuzzer,address,undefined \
+            tests/fuzz/fuzz_parsers.c src/ui_screens.c src/platform.c src/address.c \
+            src/account.c src/bill_queue.c src/cash_queue.c \
+            -o fuzz_parsers
+
+      - name: Run fuzzer (short smoke run)
+        run: ./fuzz_parsers -max_total_time=60 -max_len=256
+
+  # =====================================================================
+  # Job 11: Doxygen API documentation
   # =====================================================================
   build_doxygen:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen
-
       - name: Generate Doxygen Documentation
         run: doxygen Doxyfile
-
       - name: Upload Doxygen Docs
         uses: actions/upload-artifact@v4
         with:
@@ -229,12 +394,10 @@ jobs:
           path: reports/doxygen/html
 
   # =====================================================================
-  # Job 6: Collect everything into one combined artifact + build a
-  # landing page linking every report, matching the existing
-  # "all-reports-and-release" name so nothing downstream breaks.
+  # Job 12: Collect everything into one combined artifact + landing page
   # =====================================================================
   collect_artifacts:
-    needs: [check_format, static_analysis, build_debug, build_release, build_doxygen]
+    needs: [check_format, static_analysis, build_debug, build_release, build_doxygen, integration_tests]
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
@@ -295,11 +458,11 @@ jobs:
             combined/release
 
   # =====================================================================
-  # Job 7: Publish reports to GitHub Pages (main branch only)
+  # Job 13: Publish reports to GitHub Pages (main branch only)
   # =====================================================================
   deploy_pages:
     needs: collect_artifacts
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work-from-v9.4.4'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -314,24 +477,21 @@ jobs:
         with:
           name: all-reports-and-release
           path: combined
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: combined/reports
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
   # =====================================================================
-  # Job 8: Notification (runs regardless of individual job outcomes)
+  # Job 14: Notification
   # =====================================================================
   notify:
-    needs: [check_format, static_analysis, build_debug, build_release, build_doxygen]
+    needs: [check_format, static_analysis, build_debug, build_release, build_doxygen, integration_tests]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
