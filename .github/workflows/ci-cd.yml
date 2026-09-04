@@ -6,9 +6,9 @@ concurrency:
 
 on:
   push:
-    branches: [ main, develop, 'release/*', 'hotfix/*', 'fix/*', work-from-v9.4.4, 1st-upgrade-from-v9.4.4 ]
+    branches: [ main, develop, 'release/*' ]
   pull_request:
-    branches: [ main, develop, 'release/*', 'hotfix/*', 'fix/*', work-from-v9.4.4, 1st-upgrade-from-v9.4.4 ]
+    branches: [ main, develop, 'release/*' ]
 
 permissions:
   contents: read
@@ -462,7 +462,7 @@ jobs:
   # =====================================================================
   deploy_pages:
     needs: collect_artifacts
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/1st-upgrade-from-v9.4.4'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
